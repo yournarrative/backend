@@ -4,7 +4,7 @@ name = "silver"
 version = "0.0.1"
 description = ""
 authors = [
-  "My Name <myname@example.com>"
+  "Shayaan Jagtap <shayaan.jagtap@gmail.com>"
 ]
 license = ""
 
@@ -38,17 +38,17 @@ balanced_wrapping = true
 include_trailing_comma = true
 known_first_party = "silver"
 known_third_party = [
-  "boto3",        # Common for AWS
-  "django",       # Common web framework, if used
-  "flask",        # Common web framework, if used
-  "jinja2",       # Common templating engine
-  "matplotlib",   # Common for plotting
-  "numpy",        # Common for numerical operations
-  "pandas",       # Common for data manipulation
-  "pendulum",     # Common for date time
-  "pytest",       # Common for testing
-  "requests",     # Common for HTTP requests
-  "sqlalchemy",   # Common ORM for databases
+#  "boto3",        # Common for AWS
+#  "django",       # Common web framework, if used
+#  "flask",        # Common web framework, if used
+#  "jinja2",       # Common templating engine
+#  "matplotlib",   # Common for plotting
+#  "numpy",        # Common for numerical operations
+#  "pandas",       # Common for data manipulation
+#  "pendulum",     # Common for date time
+#  "pytest",       # Common for testing
+#  "requests",     # Common for HTTP requests
+#  "sqlalchemy",   # Common ORM for databases
 ]
 multi_line_output = 3
 profile = "black"
