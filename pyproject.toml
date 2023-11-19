@@ -55,7 +55,7 @@ profile = "black"
 line_length = 120
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=3.5.0"
