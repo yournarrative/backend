@@ -1,0 +1,4 @@
+openai:
+  api_key: "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"
+hugging_face:
+  api_key: "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"

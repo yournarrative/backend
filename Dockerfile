@@ -1,8 +1,9 @@
-FROM python:3.11-slim
+FROM python:3.9-slim
 
 # UPDATE CONTAINER
 RUN apt-get update
 RUN apt-get install -y build-essential
+RUN apt-get -y install ffmpeg
 
 # STANDARD PYTHON SETUP
 ENV PYTHONWRITEBYTECODE=1
@@ -14,15 +15,15 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV PIP_DEFAULT_TIMEOUT=100
 ENV POETRY_VERSION=1.4.0
 ENV PYTHONPATH="/app/service/src/interview_analyzer:/app/service/src"
-#ENV STAGE=$STAGE
 
+# INSTALL DEPENDENCIES
 RUN pip install "poetry==$POETRY_VERSION"
 RUN poetry config virtualenvs.create false
 
+WORKDIR /app/service
+COPY . .
 RUN poetry install
 
-COPY . .
-
-WORKDIR /app/service/src/interview_analyzer
-
-CMD ["python", "./main.py"]
+# RUN APP
+WORKDIR /app/service/
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "src/interview_analyzer/main:app", "-k", "uvicorn.workers.UvicornWorker"]
