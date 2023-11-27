@@ -62,7 +62,7 @@ async def return_speech_to_text_multiple(endpoint_input: AudioInput, request: Re
 
 @app.post("/questionAnswerFeedback/", response_model=QuestionAnswerFeedback)
 async def return_question_answer_feedback(endpoint_input: QuestionAndAnswer, request: Request):
-    logger.debug(f"Received request to provide feedback on question and answer - {QuestionAndAnswer}")
+    logger.debug(f"Received request to provide feedback on question and answer - {endpoint_input}")
     try:
         result: QuestionAnswerFeedback = await question_answer_feedback(
             endpoint_input=endpoint_input,

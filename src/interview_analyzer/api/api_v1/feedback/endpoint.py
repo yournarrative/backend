@@ -25,7 +25,7 @@ async def question_answer_feedback(endpoint_input: QuestionAndAnswer, state: Sta
     suggestion_response = await get_completion(
         interview_question=endpoint_input.question,
         answer=endpoint_input.answer,
-        open_api_key=state.config["openai"]["api_key"]
+        open_api_key=state.app_config["openai"]["api_key"]
     )
     feedback: Feedback = format_suggestions(suggestion_response)
     return QuestionAnswerFeedback(
@@ -56,7 +56,7 @@ def format_suggestions(suggestion_response: str) -> Feedback:
     negative_feedback = []
     for i, line in enumerate(suggestion_response.split("\n")):
         if LEADING_POSITIVE_FEEDBACK_TITLE in line:
-            positive_feedback.append([l for l in suggestion_response.split("\n")[i+1:i+NUM_SUGGESTIONS+1]])
+            positive_feedback.extend([l for l in suggestion_response.split("\n")[i+1:i+NUM_SUGGESTIONS+1]])
         elif LEADING_NEGATIVE_FEEDBACK_TITLE in line:
-            negative_feedback.append([l for l in suggestion_response.split("\n")[i+1:i+NUM_SUGGESTIONS+1]])
+            negative_feedback.extend([l for l in suggestion_response.split("\n")[i+1:i+NUM_SUGGESTIONS+1]])
     return Feedback(positive_feedback=positive_feedback, negative_feedback=negative_feedback)
