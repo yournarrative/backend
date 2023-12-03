@@ -8,24 +8,28 @@ LEADING_POSITIVE_FEEDBACK_TITLE: str = "Things done well"
 LEADING_NEGATIVE_FEEDBACK_TITLE: str = "Things to improve upon"
 NUM_SUGGESTIONS: int = 5
 
+
 class QuestionAndAnswer(BaseModel):
     question: str
     answer: str
 
+
 class Feedback(BaseModel):
     positive_feedback: List[str]
     negative_feedback: List[str]
+
 
 class QuestionAnswerFeedback(BaseModel):
     question: str
     answer: str
     feedback: Feedback
 
+
 async def question_answer_feedback(endpoint_input: QuestionAndAnswer, state: State) -> QuestionAnswerFeedback:
     suggestion_response = await get_completion(
         interview_question=endpoint_input.question,
         answer=endpoint_input.answer,
-        open_api_key=state.app_config["openai"]["api_key"]
+        open_api_key=state.api_keys["openai"]
     )
     feedback: Feedback = format_suggestions(suggestion_response)
     return QuestionAnswerFeedback(
@@ -42,7 +46,7 @@ async def get_completion(interview_question: str, answer: str, open_api_key: str
              "\n" + interview_question + \
              "\n" + "And the following answer:" + \
              "\n" + answer + \
-             "\n" + f"Suggest a list of {NUM_SUGGESTIONS} things the answer did well, leading with the title: '{LEADING_POSITIVE_FEEDBACK_TITLE}'" + \
+             "\n" + f". Suggest a list of {NUM_SUGGESTIONS} things the answer did well, leading with the title: '{LEADING_POSITIVE_FEEDBACK_TITLE}'" + \
              "\n" + f"and {NUM_SUGGESTIONS} things the answer improve upon leading with the title: '{LEADING_NEGATIVE_FEEDBACK_TITLE}'."
 
     messages = [{"role": "user", "content": prompt}]

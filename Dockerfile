@@ -3,7 +3,6 @@ FROM python:3.9-slim
 # UPDATE CONTAINER
 RUN apt-get update
 RUN apt-get install -y build-essential
-RUN apt-get -y install ffmpeg
 
 # STANDARD PYTHON SETUP
 ENV PYTHONWRITEBYTECODE=1

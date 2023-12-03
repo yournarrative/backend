@@ -61,7 +61,8 @@ fastapi = "^0.104.1"
 uvicorn = "^0.24.0.post1"
 gunicorn = "^21.2.0"
 pyannote-audio = "^3.1.0"
-torch = "^2.0.0"
+assemblyai = "^0.20.0"
+python-multipart = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=3.5.0"
