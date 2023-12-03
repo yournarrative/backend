@@ -9,9 +9,16 @@ from starlette.datastructures import State
 from interview_analyzer.api.api_v1.speech_to_text.helpers import cleanup_temp_file, write_to_temp_file
 from interview_analyzer.utils.standard_logger import get_logger
 
-
 logger = get_logger()
 
+
+class SpeakerType(Enum):
+    DEFAULT = "Default"
+    INTERVIEWER = "Interviewer"
+    INTERVIEWEE = "Interviewee"
+
+
+# SINGLE SPEAKER
 
 class Utterance(BaseModel):
     speaker: str
@@ -22,10 +29,26 @@ class TranscribedText(BaseModel):
     utterances: List[Utterance]
 
 
-class SpeakerType(Enum):
-    INTERVIEWER = "Interviewer"
-    INTERVIEWEE = "Interviewee"
+async def speech_to_text_single(audio_file: UploadFile, state: State) -> TranscribedText:
+    audio_file_path = write_to_temp_file(audio_file)
+    transcribed_text = await transcribe_audio_to_text_single_speaker(audio_file_path, state)
+    cleanup_temp_file(audio_file_path)
+    return transcribed_text
 
+
+async def transcribe_audio_to_text_single_speaker(audio_file_path: str, state: State):
+    transcribed_text = ""
+    try:
+        transcript = state.transcriber.transcribe(audio_file_path, config=aai.TranscriptionConfig())
+    except Exception as e:
+        logger.error(f"Failed to transcribe audio from file {audio_file_path}: {e}")
+    else:
+        transcribed_text = transcript.text
+    finally:
+        return TranscribedText(utterances=[Utterance(speaker=SpeakerType.DEFAULT.value, text=transcribed_text)])
+
+
+# MULTIPLE SPEAKERS
 
 class LabelledUtterance(BaseModel):
     speaker: SpeakerType
@@ -36,31 +59,24 @@ class LabelledTranscribedText(BaseModel):
     labelled_utterances: List[LabelledUtterance]
 
 
-async def speech_to_text(audio_file: UploadFile, state: State) -> LabelledTranscribedText:
-    # Write autio_input bytes to file
+async def speech_to_text_multiple(audio_file: UploadFile, state: State) -> LabelledTranscribedText:
     audio_file_path = write_to_temp_file(audio_file)
-    transcribed_text = await transcribe_audio_to_text(audio_file_path, state)
+    transcribed_text = await transcribe_audio_to_text_multiple_speakers(audio_file_path, state)
     cleanup_temp_file(audio_file_path)
     labelled_transcribed_text = identify_interviewer_and_interviewee(transcribed_text)
     return labelled_transcribed_text
 
 
-async def transcribe_audio_to_text(audio_file_path: str, state: State):
+async def transcribe_audio_to_text_multiple_speakers(audio_file_path: str, state: State):
     utterances: List[Utterance] = []
     try:
-        transcript = state.transcriber.transcribe(
-            audio_file_path,
-            config=aai.TranscriptionConfig(
-                speaker_labels=True,
-            ),
-        )
+        transcript = state.transcriber.transcribe(audio_file_path, config=aai.TranscriptionConfig(speaker_labels=True))
     except Exception as e:
         logger.error(f"Failed to transcribe audio from file {audio_file_path}: {e}")
     else:
         for u in transcript.utterances:
             utterances.append(Utterance(speaker=u.speaker, text=u.text))
     finally:
-        print(utterances)
         return TranscribedText(utterances=utterances)
 
 

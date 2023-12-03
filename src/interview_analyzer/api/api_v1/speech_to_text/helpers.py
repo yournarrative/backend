@@ -11,7 +11,6 @@ logger = get_logger()
 
 def write_to_temp_file(file: UploadFile) -> str:
     filetype = file.filename.split(".")[-1]
-    logger.debug(f"Filetype is {filetype}") ######
     while True:
         new_file_name = random.randint(0, 9999999999999999)
         filename = f"audio/tempfiles/{new_file_name}.{filetype}"

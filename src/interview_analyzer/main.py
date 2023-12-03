@@ -9,7 +9,8 @@ import uvicorn
 
 from interview_analyzer.api.api_v1.feedback.endpoint import QuestionAnswerFeedback, QuestionAndAnswer, \
     question_answer_feedback
-from interview_analyzer.api.api_v1.speech_to_text.endpoint import LabelledTranscribedText, speech_to_text
+from interview_analyzer.api.api_v1.speech_to_text.endpoint import LabelledTranscribedText, speech_to_text_multiple, \
+    TranscribedText, speech_to_text_single
 from interview_analyzer.app_lifespan_management import init_app_state, cleanup_app_state
 from interview_analyzer.utils.standard_logger import get_logger
 
@@ -39,11 +40,22 @@ async def health_check():
     return "I'm healthy, yo!"
 
 
-@app.post("/api-v1/audioToText/", response_model=LabelledTranscribedText)
+@app.post("/api-v1/audioToTextSingle/", response_model=TranscribedText)
+async def return_speech_to_text_single(file: UploadFile, request: Request):
+    logger.debug(f"Received request to transcribe audio to text - {file.filename}")
+    try:
+        result: TranscribedText = await speech_to_text_single(audio_file=file, state=request.app.state)
+        return result
+    except Exception as e:
+        logger.error(e)
+        return HTTPException(status_code=500)
+
+
+@app.post("/api-v1/audioToTextMultiple/", response_model=LabelledTranscribedText)
 async def return_speech_to_text(file: UploadFile, request: Request):
     logger.debug(f"Received request to transcribe audio to text - {file.filename}")
     try:
-        result: LabelledTranscribedText = await speech_to_text(audio_file=file, state=request.app.state)
+        result: LabelledTranscribedText = await speech_to_text_multiple(audio_file=file, state=request.app.state)
         return result
     except Exception as e:
         logger.error(e)

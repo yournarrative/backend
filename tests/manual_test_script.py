@@ -8,7 +8,7 @@ file = {'file': open(audio_file_path, "rb")}
 # data = {"file_type": "m4a"}
 
 # Send to Single Translate
-r = requests.post("http://0.0.0.0:5000/api-v1/audioToText/", files=file)
+r = requests.post("http://0.0.0.0:5000/api-v1/audioToTextMultiple/", files=file)
 print("Transcribed audio:")
 pprint(r.json())
 
