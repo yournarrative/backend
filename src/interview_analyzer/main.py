@@ -1,8 +1,9 @@
+import json
 import os
 from contextlib import asynccontextmanager
 from typing import Dict
 
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 import uvicorn
@@ -51,6 +52,22 @@ async def return_speech_to_text_single(file: UploadFile, request: Request):
         return HTTPException(status_code=500)
 
 
+@app.post("/api-v1/audioToTextSingleWithQuestionFeedback/", response_model=QuestionAnswerFeedback)
+async def return_speech_to_text_single(file: UploadFile = File(...), info: str = Form(...), request: Request = app.state):
+    logger.debug(f"Received request to transcribe audio to text - {file.filename}")
+    try:
+        transcribed_answer: TranscribedText = await speech_to_text_single(audio_file=file, state=request.app.state)
+        result: QuestionAnswerFeedback = await question_answer_feedback(
+            question=json.loads(info)["question"],
+            answer=transcribed_answer.utterances[0].text,
+            state=request.app.state
+        )
+        return result
+    except Exception as e:
+        logger.error(e)
+        return HTTPException(status_code=500)
+
+
 @app.post("/api-v1/audioToTextMultiple/", response_model=LabelledTranscribedText)
 async def return_speech_to_text(file: UploadFile, request: Request):
     logger.debug(f"Received request to transcribe audio to text - {file.filename}")
@@ -67,7 +84,8 @@ async def return_question_answer_feedback(endpoint_input: QuestionAndAnswer, req
     logger.debug(f"Received request to provide feedback on question and answer - {endpoint_input}")
     try:
         result: QuestionAnswerFeedback = await question_answer_feedback(
-            endpoint_input=endpoint_input,
+            question=endpoint_input.question,
+            answer=endpoint_input.answer,
             state=request.app.state
         )
         return result

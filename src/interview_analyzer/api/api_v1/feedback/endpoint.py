@@ -25,16 +25,16 @@ class QuestionAnswerFeedback(BaseModel):
     feedback: Feedback
 
 
-async def question_answer_feedback(endpoint_input: QuestionAndAnswer, state: State) -> QuestionAnswerFeedback:
+async def question_answer_feedback(question: str, answer: str, state: State) -> QuestionAnswerFeedback:
     suggestion_response = await get_completion(
-        interview_question=endpoint_input.question,
-        answer=endpoint_input.answer,
+        interview_question=question,
+        answer=answer,
         open_api_key=state.api_keys["openai"]
     )
     feedback: Feedback = format_suggestions(suggestion_response)
     return QuestionAnswerFeedback(
-        question=endpoint_input.question,
-        answer=endpoint_input.answer,
+        question=question,
+        answer=answer,
         feedback=feedback
     )
 

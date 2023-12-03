@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-from pprint import pprint
 import json
+from pprint import pprint
 import requests
 
 audio_file_path = "resources/test-audio.mp3"
 file = {'file': open(audio_file_path, "rb")}
-# data = {"file_type": "m4a"}
+data = {"info": json.dumps({"question": "Tell me about yourself?"})}
 
 # Send to Single Translate
-r = requests.post("http://0.0.0.0:5000/api-v1/audioToTextMultiple/", files=file)
+r = requests.post("http://0.0.0.0:5000/api-v1/audioToTextSingleWithQuestionFeedback/", files=file, data=data)
 print("Transcribed audio:")
 pprint(r.json())
 
