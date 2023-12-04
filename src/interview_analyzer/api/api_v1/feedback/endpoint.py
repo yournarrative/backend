@@ -1,8 +1,9 @@
 from typing import List
 
-from openai import OpenAI
 from pydantic import BaseModel
 from starlette.datastructures import State
+
+from interview_analyzer.utils.llm import get_completion
 
 LEADING_POSITIVE_FEEDBACK_TITLE: str = "Things done well"
 LEADING_NEGATIVE_FEEDBACK_TITLE: str = "Things to improve upon"
@@ -26,10 +27,10 @@ class QuestionAnswerFeedback(BaseModel):
 
 
 async def question_answer_feedback(question: str, answer: str, state: State) -> QuestionAnswerFeedback:
-    suggestion_response = await get_completion(
+    suggestion_response = await get_interview_feedback(
         interview_question=question,
         answer=answer,
-        open_api_key=state.api_keys["openai"]
+        state=state
     )
     feedback: Feedback = format_suggestions(suggestion_response)
     return QuestionAnswerFeedback(
@@ -39,20 +40,16 @@ async def question_answer_feedback(question: str, answer: str, state: State) -> 
     )
 
 
-async def get_completion(interview_question: str, answer: str, open_api_key: str, model="gpt-4"):
-    client = OpenAI(api_key=open_api_key)
+async def get_interview_feedback(interview_question: str, answer: str, state: State):
 
-    prompt = "Given the following interview question:" + \
+    prompt = "Given the following interview question: " + \
              "\n" + interview_question + \
-             "\n" + "And the following answer:" + \
+             "\n" + "And the following answer: " + \
              "\n" + answer + \
-             "\n" + f". Suggest a list of {NUM_SUGGESTIONS} things the answer did well, leading with the title: '{LEADING_POSITIVE_FEEDBACK_TITLE}'" + \
+             "\n" + f"Suggest a list of {NUM_SUGGESTIONS} things the answer did well, leading with the title: '{LEADING_POSITIVE_FEEDBACK_TITLE}'" + \
              "\n" + f"and {NUM_SUGGESTIONS} things the answer improve upon leading with the title: '{LEADING_NEGATIVE_FEEDBACK_TITLE}'."
-
-    messages = [{"role": "user", "content": prompt}]
-
-    response = client.chat.completions.create(model=model, messages=messages, temperature=0)
-    return response.choices[0].message.content
+    response = await get_completion(prompt, state)
+    return response
 
 
 def format_suggestions(suggestion_response: str) -> Feedback:
