@@ -189,3 +189,4 @@ Cargo.lock
 tmp*
 resources/**audio**
 resources/api-keys.yaml
+**.m4a

@@ -7,8 +7,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 import uvicorn
 
-from interview_analyzer.api.api_v1.feedback.endpoint import QuestionAnswerFeedback, QuestionAndAnswer, \
-    question_answer_feedback
+from interview_analyzer.api.api_v1.feedback.endpoint import question_answer_feedback
+from interview_analyzer.api.api_v1.feedback.model import QuestionAnswerFeedback, QuestionAndAnswer
 from interview_analyzer.api.api_v1.speech_to_text.endpoint import LabelledTranscribedText, speech_to_text_multiple, \
     TranscribedText, speech_to_text_single
 from interview_analyzer.app_lifespan_management import init_app_state, cleanup_app_state
@@ -51,7 +51,7 @@ async def return_speech_to_text_single(file: UploadFile, request: Request):
         return HTTPException(status_code=500)
 
 
-@app.post("/api-v1/audioToTextSingleWithQuestionFeedback/", response_model=QuestionAnswerFeedback)
+@app.post("/api-v1/audioToTextSingleWithPreviousFeedback/", response_model=QuestionAnswerFeedback)
 async def return_speech_to_text_single(file: UploadFile = File(...), info: str = Form(...), request: Request = app.state):
     logger.debug(f"Received request to transcribe audio to text - {file.filename}")
     try:

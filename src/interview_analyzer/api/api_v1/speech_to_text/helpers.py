@@ -8,8 +8,8 @@ import assemblyai as aai
 from fastapi import UploadFile
 from starlette.datastructures import State
 
-from interview_analyzer.api.api_v1.speech_to_text.endpoint import TranscribedText, Utterance, SpeakerType, \
-    LabelledUtterance, LabelledTranscribedText
+from interview_analyzer.api.api_v1.speech_to_text.model import LabelledUtterance, SpeakerType, TranscribedText, \
+    LabelledTranscribedText, Utterance
 from interview_analyzer.utils.llm import get_completion
 from interview_analyzer.utils.standard_logger import get_logger
 
@@ -62,13 +62,13 @@ async def transcribe_audio_to_text_multiple_speakers(audio_file_path: str, state
         return TranscribedText(utterances=utterances)
 
 
-def identify_and_assign_personas(transcribed_text: TranscribedText, state: State):
-    identified_personas = identify_personas(transcribed_text, state)
+async def identify_and_assign_personas(transcribed_text: TranscribedText, state: State):
+    identified_personas = await identify_personas(transcribed_text, state)
     labelled_utterances = assign_personas(transcribed_text, identified_personas)
     return LabelledTranscribedText(labelled_utterances=labelled_utterances)
 
 
-def identify_personas(transcribed_text: TranscribedText, state: State) -> Dict[str, List[str]]:
+async def identify_personas(transcribed_text: TranscribedText, state: State) -> Dict[str, List[str]]:
     speakers_to_utterances_map: Dict[str, List] = defaultdict(list)
     for utterance in transcribed_text.utterances:
         speakers_to_utterances_map[utterance.speaker].append(utterance.text[:50])

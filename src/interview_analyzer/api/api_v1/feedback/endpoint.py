@@ -1,29 +1,11 @@
-from typing import List
-
-from pydantic import BaseModel
 from starlette.datastructures import State
 
+from interview_analyzer.api.api_v1.feedback.model import Feedback, QuestionAnswerFeedback
 from interview_analyzer.utils.llm import get_completion
 
 LEADING_POSITIVE_FEEDBACK_TITLE: str = "Things done well"
 LEADING_NEGATIVE_FEEDBACK_TITLE: str = "Things to improve upon"
 NUM_SUGGESTIONS: int = 5
-
-
-class QuestionAndAnswer(BaseModel):
-    question: str
-    answer: str
-
-
-class Feedback(BaseModel):
-    positive_feedback: List[str]
-    negative_feedback: List[str]
-
-
-class QuestionAnswerFeedback(BaseModel):
-    question: str
-    answer: str
-    feedback: Feedback
 
 
 async def question_answer_feedback(question: str, answer: str, state: State) -> QuestionAnswerFeedback:
