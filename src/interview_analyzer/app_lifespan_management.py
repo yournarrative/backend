@@ -1,4 +1,6 @@
+import os
 from typing import Dict, Any
+from dotenv import load_dotenv, find_dotenv
 
 import assemblyai as aai
 import yaml
@@ -11,9 +13,10 @@ logger = get_logger()
 
 
 async def init_app_state(state: State):
+    load_dotenv(find_dotenv())
     state.config = load_config("resources/config.yaml")
-    state.api_keys = load_config("resources/api-keys.yaml")
-    aai.settings.api_key = state.api_keys["assemblyai"]
+    state.env = os.environ
+    aai.settings.api_key = state.env.get("ASSEMBLYAI_API_KEY")
     state.transcriber = aai.Transcriber()
 
 
