@@ -3,8 +3,6 @@
 name: Build and Push Backend Image to AWS ECR
 on:
   push:
-    paths-ignore:
-    - frontend/**
     branches: [ main ]
   workflow_dispatch: 
     inputs:
@@ -41,6 +39,7 @@ jobs:
       id: increment-git-tag
       run: |
         bash ./.build/git_update.sh -v patch
+
     - name: Build, Tag, and Push the Image to Amazon ECR
       id: build-image
       env:
