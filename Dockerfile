@@ -4,6 +4,14 @@ FROM python:3.9-slim
 RUN apt-get update
 RUN apt-get install -y build-essential
 
+ARG PORT=5001
+ARG HOST="0.0.0.0"
+
+ENV PORT=$PORT
+ENV HOST=$HOST
+
+EXPOSE $PORT
+
 # STANDARD PYTHON SETUP
 ENV PYTHONWRITEBYTECODE=1
 ENV PYTHONFAULTHANDLER=1
@@ -25,4 +33,4 @@ RUN poetry install
 
 # RUN APP
 WORKDIR /app/service/
-CMD ["gunicorn", "--config", "src/interview_analyzer/gunicorn.conf.py", "src.interview_analyzer.main:app", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["gunicorn", "--config", "src/interview_analyzer/gunicorn.conf.py", "src.interview_analyzer.main:app"]

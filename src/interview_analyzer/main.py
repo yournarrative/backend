@@ -94,4 +94,4 @@ async def return_question_answer_feedback(endpoint_input: QuestionAndAnswer, req
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=os.getenv("PORT", 5000))
+    uvicorn.run(app, host=os.getenv("HOST", "0.0.0.0"), port=os.getenv("PORT", 5001))
