@@ -25,4 +25,4 @@ RUN poetry install
 
 # RUN APP
 WORKDIR /app/service/
-CMD ["gunicorn", "--config", "gunicorn.conf.py", "src/interview_analyzer/main:app", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["gunicorn", "--config", "src/interview_analyzer/gunicorn.conf.py", "src.interview_analyzer.main:app", "-k", "uvicorn.workers.UvicornWorker"]
