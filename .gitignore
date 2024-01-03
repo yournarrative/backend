@@ -187,6 +187,6 @@ Cargo.lock
 # Misc
 ##########################################################################################
 tmp*
-resources/**audio**
+audio
 resources/api-keys.yaml
 audio/static/
