@@ -19,6 +19,12 @@ async def init_app_state(state: State):
     aai.settings.api_key = state.env.get("ASSEMBLYAI_API_KEY")
     state.transcriber = aai.Transcriber()
 
+    # Create temp location for]
+    if not os.path.exists(os.getcwd() + "/audio"):
+        os.mkdir(os.getcwd() + "/audio", mode=0o777)
+    if not os.path.exists(os.getcwd() + "/audio/tmp"):
+        os.mkdir(os.getcwd() + "/audio/tmp", mode=0o777)
+
 
 def load_config(path: str) -> Dict[str, Any]:
     logger.debug(f"Loading config from {path}...")

@@ -51,23 +51,23 @@ async def return_speech_to_text_single(file: UploadFile, request: Request):
         return HTTPException(status_code=500)
 
 
-@app.post("/api-v1/audioToTextSingleWithPreviousFeedback/", response_model=QuestionAnswerFeedback)
-async def return_speech_to_text_single(file: UploadFile = File(...), info: str = Form(...), request: Request = app.state):
-    logger.debug(f"Received request to transcribe audio to text - {file.filename}")
-    try:
-        transcribed_answer: TranscribedText = await speech_to_text_single(audio_file=file, state=request.app.state)
-        result: QuestionAnswerFeedback = await question_answer_feedback(
-            question=json.loads(info)["question"],
-            answer=transcribed_answer.utterances[0].text,
-            state=request.app.state
-        )
-        return result
-    except Exception as e:
-        logger.error(e)
-        return HTTPException(status_code=500)
+# @app.post("/api-v1/audioToTextSingleWithPreviousFeedback/", response_model=QuestionAnswerFeedback)
+# async def return_speech_to_text_single(file: UploadFile = File(...), info: str = Form(...), request: Request = app.state):
+#     logger.debug(f"Received request to transcribe audio to text - {file.filename}")
+#     try:
+#         transcribed_answer: TranscribedText = await speech_to_text_single(audio_file=file, state=request.app.state)
+#         result: QuestionAnswerFeedback = await question_answer_feedback(
+#             question=json.loads(info)["question"],
+#             answer=transcribed_answer.utterances[0].text,
+#             state=request.app.state
+#         )
+#         return result
+#     except Exception as e:
+#         logger.error(e)
+#         return HTTPException(status_code=500)
 
 
-@app.post("/api-v1/audioToTextMultiple/", response_model=LabelledTranscribedText)
+@app.post("/api-v1/audioToTextMultipleSpeakers/", response_model=LabelledTranscribedText)
 async def return_speech_to_text(file: UploadFile, request: Request):
     logger.debug(f"Received request to transcribe audio to text - {file.filename}")
     try:
