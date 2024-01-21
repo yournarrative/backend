@@ -124,7 +124,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+secrets.env
 .venv
 env/
 venv/
@@ -187,7 +187,7 @@ Cargo.lock
 # Misc
 ##########################################################################################
 tmp
-audio
-resources/api-keys.yaml
+resources/audio
 audio/static/
 **.DS_Store
+**/.env

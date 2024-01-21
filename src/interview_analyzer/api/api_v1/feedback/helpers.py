@@ -1,7 +1,7 @@
 from starlette.datastructures import State
 
 from interview_analyzer.api.api_v1.feedback.model import Feedback
-from interview_analyzer.utils.openai import get_completion
+from interview_analyzer.core.open_ai.standard_request import get_completion
 
 LEADING_POSITIVE_FEEDBACK_TITLE: str = "Things done well"
 LEADING_NEGATIVE_FEEDBACK_TITLE: str = "Things to improve upon"

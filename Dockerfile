@@ -12,6 +12,10 @@ ENV HOST=$HOST
 
 EXPOSE $PORT
 
+# ENVIRONMENT
+ARG ENVIRONMENT="local"
+ENV ENVIRONMENT=$ENVIRONMENT
+
 # STANDARD PYTHON SETUP
 ENV PYTHONWRITEBYTECODE=1
 ENV PYTHONFAULTHANDLER=1
@@ -28,9 +32,11 @@ RUN pip install "poetry==$POETRY_VERSION"
 RUN poetry config virtualenvs.create false
 
 WORKDIR /app/service
-COPY . .
+
+COPY poetry.lock pyproject.toml ./
 RUN poetry install
 
+COPY . .
+
 # RUN APP
-WORKDIR /app/service/
 CMD ["gunicorn", "--config", "src/interview_analyzer/gunicorn.conf.py", "src.interview_analyzer.main:app"]
