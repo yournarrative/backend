@@ -1,3 +1,4 @@
+import json
 from contextlib import asynccontextmanager
 from typing import List
 
@@ -6,6 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 import uvicorn
 
+from interview_analyzer.api.api_v1.email.endpoint import send_email
 from interview_analyzer.api.api_v1.enrich.endpoint import enrich_transcript
 from interview_analyzer.api.api_v1.enrich.model import EnrichedTranscript
 from interview_analyzer.api.api_v1.feedback.endpoint import question_answer_feedback
@@ -106,10 +108,7 @@ async def process_s3_file_into_rds(data: ProcessS3Request, request: Request):
                 async_session=request.app.state.database_access_layer.async_session,
                 interview_uuid=interview_uuid
             )
-            logger.debug(f"Finished with test loop before email send-off: {email_address}")
-
-            #  TODO: SEND EMAIL HERE
-
+            await send_email(interview=interview, to_email=email_address)  # TODO: Make this do something
         return Response(status_code=200)
     except Exception as e:
         logger.error(e)

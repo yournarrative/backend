@@ -21,7 +21,11 @@ import requests
 
 
 # READ OBJECT FROM S3 AND PROCESS
-payload = {"bucket": "ghosted-interviews-test", "key": "f2debf4c-511e-4ac1-879e-6581c0bfeed6/test-interview.m4a"}
+payload = {
+    "bucket": "ghosted-interviews-test",
+    "key": "f2debf4c-511e-4ac1-879e-6581c0bfeed6/test-interview.m4a",
+    "send_email_when_finished": True,
+}
 r = requests.post("http://0.0.0.0:5001/api-v1/process/audioFileToDatabaseUpdate/", json=payload)
 print("Response")
 pprint(r.status_code)

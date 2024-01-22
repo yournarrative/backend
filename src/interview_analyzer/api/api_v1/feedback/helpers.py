@@ -44,6 +44,7 @@ def collect_answer(i: int, question_number: int, utterances: List[LabelledUttera
             answer_list.append(cur.text)
         i += 1
         if cur.question_number > question_number:
+            i -= 1
             break
     return i, " ".join(answer_list).strip()
 
