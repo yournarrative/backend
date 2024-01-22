@@ -3,7 +3,7 @@ import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import text
 
-from interview_analyzer.api.api_v1.enrich.model import EnrichedTranscript
+from interview_analyzer.api.api_v1.interview.model import Interview
 from interview_analyzer.utils.standard_logger import get_logger
 
 
@@ -45,17 +45,17 @@ async def get_interview_id_from_rds_using_s3_path(async_session: AsyncSession, s
     return str(interview_id)
 
 
-async def update_interview_with_enriched_transcript(
+async def update_interview_with_interview_object(
         async_session: AsyncSession,
         interview_uuid: str,
-        enriched_transcript: EnrichedTranscript
+        interview: Interview,
 ) -> None:
     logger.debug(f"Updating interview {interview_uuid} with transcript and enriched transcript...")
     async with async_session as session:
         query = text(
             f"""
             UPDATE interviews
-            SET data = jsonb_set(data, '{{enriched_transcript}}', '{json.dumps(enriched_transcript.model_json_schema())}',
+            SET data = jsonb_set(data, '{{interview}}', '{json.dumps(interview.model_json_schema())}',
              true),
              processed = true
             WHERE id = '{interview_uuid}';

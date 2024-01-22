@@ -14,14 +14,14 @@ class SimpleAIChatConnector:
             api_key=api_key,
             console=False,
             save_messages=False,
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             params={"temperature": 0.0}
         )
 
-    def get_structured_response(self, system_prompt: str, output_model: pydantic.BaseModel) -> pydantic.BaseModel:
+    def get_structured_response(self, system_prompt: str, instructions: str, output_model: pydantic.BaseModel) -> pydantic.BaseModel:
         try:
             response_structured = self.ai(
-                "Please analyze this interview transcript.",
+                instructions,
                 output_schema=output_model,
                 system=system_prompt,
             )

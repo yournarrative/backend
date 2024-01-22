@@ -1,12 +1,16 @@
 from contextlib import asynccontextmanager
+from typing import List
 
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile, Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 import uvicorn
 
 from interview_analyzer.api.api_v1.enrich.endpoint import enrich_transcript
 from interview_analyzer.api.api_v1.enrich.model import EnrichedTranscript
+from interview_analyzer.api.api_v1.feedback.endpoint import question_answer_feedback
+from interview_analyzer.api.api_v1.feedback.model import QuestionAndAnswerWithFeedback
+from interview_analyzer.api.api_v1.interview.model import Interview
 from interview_analyzer.api.api_v1.transcribe.model import SimpleTranscript
 from interview_analyzer.api.api_v1.transcribe.endpoint import transcribe_upload_file_speech_to_text, \
     transcribe_bytes_file_speech_to_text
@@ -76,21 +80,26 @@ async def process_s3_file_into_rds(data: ProcessS3Request, request: Request):
         transcript: SimpleTranscript = await transcribe_bytes_file_speech_to_text(
             audio_file=audio_file,
             filename=data.key,
-            state=request.app.state
+            state=request.app.state,
         )
         enriched_transcript: EnrichedTranscript = await enrich_transcript(
             transcript=transcript,
-            state=request.app.state
+            state=request.app.state,
         )
+        analysis: List[QuestionAndAnswerWithFeedback] = await question_answer_feedback(
+            enriched_transcript=enriched_transcript,
+            state=request.app.state,
+        )
+        interview = Interview(enriched_transcript=enriched_transcript, analysis=analysis)
         interview_uuid = await crud.get_interview_id_from_rds_using_s3_path(
             async_session=request.app.state.database_access_layer.async_session,
             s3_bucket=data.bucket,
             s3_key=data.key
         )
-        await crud.update_interview_with_enriched_transcript(
+        await crud.update_interview_with_interview_object(
             async_session=request.app.state.database_access_layer.async_session,
             interview_uuid=interview_uuid,
-            enriched_transcript=enriched_transcript
+            interview=interview,
         )
         if data.send_email_when_finished:
             email_address: str = await crud.get_email_from_rds_using_interview_uuid(
@@ -101,7 +110,7 @@ async def process_s3_file_into_rds(data: ProcessS3Request, request: Request):
 
             #  TODO: SEND EMAIL HERE
 
-        return 200
+        return Response(status_code=200)
     except Exception as e:
         logger.error(e)
         return HTTPException(status_code=500)
