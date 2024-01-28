@@ -10,6 +10,14 @@ from interview_analyzer.utils.standard_logger import get_logger
 logger = get_logger()
 
 
+def load_env() -> Dict[str, str]:
+    logger.debug("Loading env variables...")
+    env = dict(os.environ)
+    for k, v in env.items():
+        env[k] = str(v).replace('"', "")
+    return env
+
+
 def load_config_from_env(env: str) -> Dict[str, Any]:
     logger.debug(f"Loading config from env {env}...")
     with open(f"resources/config/{env}/conf.yaml", "r") as config_file:

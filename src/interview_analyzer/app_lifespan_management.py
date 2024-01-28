@@ -8,13 +8,12 @@ from interview_analyzer.core.open_ai.simpleaichat import create_simple_ai_chat_c
 from interview_analyzer.data.rds.database import create_database_access_layer
 from interview_analyzer.data.s3.connector import create_s3_connector
 from interview_analyzer.core.open_ai.assistants.assistant_manager_factory import initialize_ai_assistants
-from interview_analyzer.utils.files import create_temp_directory, load_config_from_env
+from interview_analyzer.utils.files import create_temp_directory, load_config_from_env, load_env
 
 
 async def init_app_state(state: State):
     # Load env variables
-    load_dotenv(find_dotenv())
-    state.env = os.environ
+    state.env = load_env()
 
     # Load config
     state.config = load_config_from_env(env=state.env.get("ENVIRONMENT"))

@@ -13,6 +13,8 @@ services:
       - resources/config/local/.env
     networks:
       - mynetwork
+    depends_on:
+      - db
   db:
     image: postgres:11
     ports:

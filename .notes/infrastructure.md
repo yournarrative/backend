@@ -11,3 +11,7 @@
    1. Security group allows all inbound traffic on port 5001
 4. Manually revise & deploy task definition to update image version
 5. Lambda will be created on the AWS UI to read from S3 and invoke backend service
+
+
+### Guides
+AWS ECS Setup: https://www.youtube.com/watch?v=00I3czV8guk
