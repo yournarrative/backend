@@ -1,6 +1,3 @@
-import os
-from dotenv import load_dotenv, find_dotenv
-
 from starlette.datastructures import State
 
 from interview_analyzer.core.assembly_ai.transcriber import create_assembly_ai_transcriber
