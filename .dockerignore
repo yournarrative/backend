@@ -2,8 +2,10 @@
 **
 
 # ... except for dependencies and source
-!secrets.env
 !pyproject.toml
 !poetry.lock
 !src/
 !resources/
+
+# But ignore env files
+resources/config/**/.env
