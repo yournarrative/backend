@@ -15,10 +15,8 @@ CREATE TABLE users (
 CREATE TABLE interviews (
     id                      uuid            NOT NULL DEFAULT uuid_generate_v4(),
     user_id                 uuid            NOT NULL REFERENCES users(id),
-    transcript              text            ,
     data                    jsonb           NOT NULL DEFAULT '{}'::jsonb,
     processed               boolean         NOT NULL DEFAULT false,
-    processed_date          timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
     created_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
     updated_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
     PRIMARY KEY(id)
