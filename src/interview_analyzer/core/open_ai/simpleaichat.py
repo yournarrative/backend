@@ -14,23 +14,26 @@ class SimpleAIChatConnector:
             api_key=api_key,
             console=False,
             save_messages=False,
-            model="gpt-4",
+            model="gpt-4-turbo-preview",
             params={"temperature": 0.0}
         )
 
     def get_structured_response(self, system_prompt: str, instructions: str, output_model: pydantic.BaseModel) -> pydantic.BaseModel:
         try:
-            response_structured = self.ai(
+            print(instructions[-100:])
+            structured_response = self.ai(
                 instructions,
                 output_schema=output_model,
                 system=system_prompt,
             )
+            print('STRUCTURED RESPONSE:::')
+            print(structured_response)
         except Exception as e:
             logger.error(f"Failed to get response from SimpleAIChatConnector: {e}")
             raise e
 
         try:
-            output = output_model(**response_structured)
+            output = output_model(**structured_response)
             return output
         except Exception as e:
             logger.error(f"Failed to parse response from OpenAI: {e}")

@@ -35,7 +35,6 @@ def organize_questions_and_answers(enriched_transcript: EnrichedTranscript) -> L
 
 
 def collect_answer(i: int, question_number: int, utterances: List[LabelledUtterance]) -> Tuple[int, str]:
-    logger.debug(f"Made it out the hood: {i}")
     answer_list: List[str] = []
     while i < len(utterances):
         cur: LabelledUtterance = utterances[i]

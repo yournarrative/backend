@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import json
 from pprint import pprint
 import requests
 
@@ -23,9 +22,11 @@ import requests
 # READ OBJECT FROM S3 AND PROCESS
 payload = {
     "bucket": "ghosted-interviews-test",
-    "key": "f2debf4c-511e-4ac1-879e-6581c0bfeed6/test-interview.m4a",
+    "key": "f2debf4c-511e-4ac1-879e-6581c0bfeed6/test-interview-2.mp3",
     "send_email_when_finished": True,
 }
+# r = requests.post("http://0.0.0.0:5001/api-v1/convert/convertAudio/", json=payload)
 r = requests.post("http://0.0.0.0:5001/api-v1/process/audioFileToDatabaseUpdate/", json=payload)
+
 print("Response")
 pprint(r.status_code)

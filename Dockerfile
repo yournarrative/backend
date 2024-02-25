@@ -3,6 +3,7 @@ FROM python:3.9-slim
 # UPDATE CONTAINER
 RUN apt-get update
 RUN apt-get install -y build-essential
+RUN apt-get install ffmpeg -y
 
 ARG PORT=5001
 ARG HOST="0.0.0.0"

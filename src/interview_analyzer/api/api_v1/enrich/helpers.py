@@ -15,6 +15,7 @@ async def send_for_analysis(transcript: SimpleTranscript, state: State) -> Enric
     system_prompt: str = interview_analysis_system_prompt
     instructions: str = f"Please analyze this interview transcript: {json.dumps(transcript.model_dump(mode='json')['utterances'])}"
 
+    # 13 min interview char length: 19033
     enriched_transcript: EnrichedTranscript = state.simple_ai_chat_connector.get_structured_response(
         system_prompt=system_prompt, instructions=instructions, output_model=EnrichedTranscript)
     return enriched_transcript

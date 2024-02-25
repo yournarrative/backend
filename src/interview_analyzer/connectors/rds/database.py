@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.orm import sessionmaker
 from starlette.datastructures import State
 
-from interview_analyzer.data.rds.model import create_extensions, Base, create_update_triggers, \
+from interview_analyzer.connectors.rds.model import create_extensions, Base, create_update_triggers, \
     create_users_trigger, create_interviews_trigger
 from interview_analyzer.utils.standard_logger import get_logger
 
