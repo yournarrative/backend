@@ -18,15 +18,48 @@ import requests
 # print("\nSuggestions:")
 # pprint(r.json())
 
-
-# READ OBJECT FROM S3 AND PROCESS
 payload = {
-    "bucket": "ghosted-interviews-test",
-    "key": "f2debf4c-511e-4ac1-879e-6581c0bfeed6/test-interview-2.mp3",
-    "send_email_when_finished": True,
-}
-# r = requests.post("http://0.0.0.0:5001/api-v1/convert/convertAudio/", json=payload)
-r = requests.post("http://0.0.0.0:5001/api-v1/process/audioFileToDatabaseUpdate/", json=payload)
+    "user_email": "shayaan.jagtap@gmail.com",
+    "content": "I am working on two projects - one interview analyzer that converts "
+               "interviews into actionable feedback, and another project that stores and retrieves "
+               "information about all about a persons career",
+    "question": "What projects are you working on?",
+    "document_type": "Q&A"
 
-print("Response")
+}
+r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertDocument/", json=payload)
+
+print("Uploaded document for shayaan.jagtap@gmail.com")
 pprint(r.status_code)
+
+payload = {
+    "user_email": "tryghosted@gmail.com",
+    "content": "I am working on a project that converts blackholes to unlimited energy sources",
+    "question": "What projects are you working on?",
+    "document_type": "Q&A"
+}
+r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertDocument/", json=payload)
+
+print("Uploaded document for tryghosted@gmail.com")
+pprint(r.status_code)
+
+
+payload = {
+    "user_email": "shayaan.jagtap@gmail.com",
+    "query": "What skills have I learned and what projects have I worked on?"
+}
+r = requests.post("http://0.0.0.0:5001/api-v1/query/queryUserHistory/", json=payload)
+
+print("Response for query shayaan.jagtap@gmail.com")
+pprint(r.status_code)
+pprint(r.text)
+
+payload = {
+    "user_email": "tryghosted@gmail.com",
+    "query": "What skills have I learned and what projects have I worked on?"
+}
+r = requests.post("http://0.0.0.0:5001/api-v1/query/queryUserHistory/", json=payload)
+
+print("Response for query tryghosted@gmail.com")
+pprint(r.status_code)
+pprint(r.text)

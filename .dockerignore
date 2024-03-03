@@ -9,3 +9,4 @@
 
 # But ignore env files
 resources/config/**/.env
+src/interview_analyzer/

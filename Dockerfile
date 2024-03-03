@@ -40,4 +40,4 @@ RUN poetry install
 COPY . .
 
 # RUN APP
-CMD ["gunicorn", "--config", "src/interview_analyzer/gunicorn.conf.py", "src.interview_analyzer.main:app"]
+CMD ["gunicorn", "--config", "src/information_retrieval/gunicorn.conf.py", "src.information_retrieval.main:app"]
