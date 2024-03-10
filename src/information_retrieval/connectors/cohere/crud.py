@@ -29,7 +29,8 @@ async def RAG_query(user_email: str, query: str, documents: List[RetrieveDocumen
         response: Chat = state.cohere_client.chat(
             model="command",
             message=query,
-            documents=formatted_docs
+            documents=formatted_docs,
+            prompt_truncation='AUTO'
         )
         logger.debug(f"Successfully fetched response from Cohere API.")
 
