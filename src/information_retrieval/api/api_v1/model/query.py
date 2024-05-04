@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -14,3 +14,9 @@ class RAGResponse(BaseModel):
     response: str
     citations: List
     documents: List
+
+
+class GetActivitiesForUser(BaseModel):
+    user_id: str
+    start_date: Optional[str]
+    in_progress_only: Optional[bool] = False

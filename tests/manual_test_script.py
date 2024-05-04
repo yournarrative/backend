@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 from pprint import pprint
 import requests
 
@@ -6,11 +7,28 @@ import requests
 # file = {'file': open(audio_file_path, "rb")}
 # data = {"info": json.dumps({"question": "Tell me about yourself?"})}
 
+activities = [
+    {
+        "title": "Building a Python API Server",
+        "description": "Building a Python API Server using FastAPI and Docker to get Narrative launched",
+        "category": "Skill",
+        "status": "In Progress",
+    },
+    {
+        "title": "Launching Narrative",
+        "description": "Helping get the designs, tech, and copy ready to launch Narrative",
+        "category": "Achievement",
+        "status": "In Progress",
+    },
+]
+data = {"user_id": "f2debf4c-511e-4ac1-879e-6581c0bfeed6", "activities": activities}
+
+
 # Send to Single Translate
-# r = requests.post("http://0.0.0.0:5001/api-v1/transcribe/audioToSimpleTranscript/", files=file, data=data)
-# print("Transcribed audio:")
-# # pprint(r.text)
-# pprint(r.json())
+r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertActivities/", json=data)
+print("Response:")
+# pprint(r.text)
+pprint(r.status_code)
 
 # Get Suggestions
 # payload = {"question": "Tell me about yourself?", "answer": r.json()["text"]}
@@ -18,48 +36,49 @@ import requests
 # print("\nSuggestions:")
 # pprint(r.json())
 
-payload = {
-    "user_email": "shayaan.jagtap@gmail.com",
-    "content": "I am working on two projects - one interview analyzer that converts "
-               "interviews into actionable feedback, and another project that stores and retrieves "
-               "information about all about a persons career",
-    "question": "What projects are you working on?",
-    "document_type": "Q&A"
+# payload = {
+#     "user_email": "shayaan.jagtap@gmail.com",
+#     "content": "I am working on two projects - one interview analyzer that converts "
+#                "interviews into actionable feedback, and another project that stores and retrieves "
+#                "information about all about a persons career",
+#     "question": "What projects are you working on?",
+#     "document_type": "Q&A"
+#
+# }
+# r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertDocument/", json=payload)
 
-}
-r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertDocument/", json=payload)
+# print("Uploaded document for shayaan.jagtap@gmail.com")
+# pprint(r.status_code)
 
-print("Uploaded document for shayaan.jagtap@gmail.com")
-pprint(r.status_code)
+# payload = {
+#     "user_email": "tryghosted@gmail.com",
+#     "content": "I am working on a project that converts blackholes to unlimited energy sources",
+#     "question": "What projects are you working on?",
+#     "document_type": "Q&A"
+# }
+# r = requests.post("http://GhostedBackendALBProd-2139097039.us-east-1.elb.amazonaws.com/api-v1/insert/insertDocument/", json=payload)
+#
+# print("Uploaded document for tryghosted@gmail.com")
+# pprint(r.status_code)
 
-payload = {
-    "user_email": "tryghosted@gmail.com",
-    "content": "I am working on a project that converts blackholes to unlimited energy sources",
-    "question": "What projects are you working on?",
-    "document_type": "Q&A"
-}
-r = requests.post("http://0.0.0.0:5001/api-v1/insert/insertDocument/", json=payload)
+# start = time.time()
+# payload = {
+#     "user_email": "shayaan.jagtap@gmail.com",
+#     "query": "What skills have I learned and what projects have I worked on?"
+# }
+# r = requests.post("http://GhostedBackendALBProd-2139097039.us-east-1.elb.amazonaws.com/api-v1/query/queryUserHistory/", json=payload)
+#
+# print("Response for query shayaan.jagtap@gmail.com")
+# pprint(r.status_code)
+# pprint(r.text)
+# print(f"Elapsed time for 1000 docs: {time.time() - start}")
 
-print("Uploaded document for tryghosted@gmail.com")
-pprint(r.status_code)
-
-
-payload = {
-    "user_email": "shayaan.jagtap@gmail.com",
-    "query": "What skills have I learned and what projects have I worked on?"
-}
-r = requests.post("http://0.0.0.0:5001/api-v1/query/queryUserHistory/", json=payload)
-
-print("Response for query shayaan.jagtap@gmail.com")
-pprint(r.status_code)
-pprint(r.text)
-
-payload = {
-    "user_email": "tryghosted@gmail.com",
-    "query": "What skills have I learned and what projects have I worked on?"
-}
-r = requests.post("http://0.0.0.0:5001/api-v1/query/queryUserHistory/", json=payload)
-
-print("Response for query tryghosted@gmail.com")
-pprint(r.status_code)
-pprint(r.text)
+# payload = {
+#     "user_email": "tryghosted@gmail.com",
+#     "query": "What skills have I learned and what projects have I worked on?"
+# }
+# r = requests.post("http://0.0.0.0:5001/api-v1/query/queryUserHistory/", json=payload)
+#
+# print("Response for query tryghosted@gmail.com")
+# pprint(r.status_code)
+# pprint(r.text)

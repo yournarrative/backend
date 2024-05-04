@@ -13,26 +13,6 @@ services:
       - resources/config/local/.env
     networks:
       - mynetwork
-    depends_on:
-      - db
-  db:
-    image: postgres:11
-    ports:
-      - 5432:5432
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    env_file:
-      - resources/config/local/.env
-    environment:
-      POSTGRES_USER: localghost
-      POSTGRES_PASSWORD: localghost
-      POSTGRES_DB: ghosted
-    networks:
-      - mynetwork
-
-volumes:
-  pg_data:
-    driver: local
 
 networks:
   mynetwork:

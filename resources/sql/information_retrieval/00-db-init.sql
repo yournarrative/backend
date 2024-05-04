@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION update_updated_on_column()
 
 CREATE TABLE users (
     id                      uuid            NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
-    auth_user_id            text            NOT NULL UNIQUE,
+    email                   text            NOT NULL UNIQUE,
     data                    jsonb           NOT NULL DEFAULT '{}'::jsonb,
     created_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
     updated_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
@@ -33,13 +33,13 @@ CREATE TABLE check_ins (
 
 CREATE TABLE activity_status_options (
     id                      smallserial     NOT NULL,
-    status                  varchar(20)     NOT NULL,
+    status                  varchar(20)     NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE activity_category_options (
     id                      smallserial     NOT NULL,
-    category                varchar(20)     NOT NULL,
+    category                varchar(20)     NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 
