@@ -10,18 +10,17 @@ from information_retrieval.utils.standard_logger import get_logger
 logger = get_logger()
 
 
-async def get_user_by_id(supabase: Client, user_id: str) -> NarrativeUser:
+async def get_user_email_by_id(supabase: Client, user_id: str) -> NarrativeUser:
     logger.debug(f"Getting all documents for user: {user_id}")
     try:
         response: APIResponse = (
             supabase
-                .table("users")
-                .select("data->first_name, data->last_name, email")
+                .table("profiles")
+                .select("id, email")
                 .eq("id", user_id)
                 .execute()
         )
-        user = NarrativeUser(first_name=response.data[0].get("first_name"),
-                             last_name=response.data[0].get("last_name"),
+        user = NarrativeUser(id=response.data[0].get("id"),
                              email=response.data[0].get("email"))
         return user
     except Exception as e:
@@ -29,11 +28,16 @@ async def get_user_by_id(supabase: Client, user_id: str) -> NarrativeUser:
         raise e
 
 
-async def insert_new_user_activity(supabase: Client, user_id: str, activities: List[Activity]):
+async def insert_new_user_activities(supabase: Client, user_id: str, activities: List[Activity]):
     logger.debug(f"Inserting new activity - user_id: {user_id}, activities: {activities}")
     # TODO: Validate that category, status columns are valid
     try:
-        data_to_upsert = [dict(activity) for activity in activities]
+        data_to_upsert = []
+        for activity in activities:
+            d = dict(activity)
+            d['user_id'] = user_id
+            data_to_upsert.append(d)
+
         data, count = (
             supabase
                 .table("activities")

@@ -12,7 +12,7 @@ activities = [
         "title": "Building a Python API Server",
         "description": "Building a Python API Server using FastAPI and Docker to get Narrative launched",
         "category": "Skill",
-        "status": "In Progress",
+        "status": "Completed",
     },
     {
         "title": "Launching Narrative",
@@ -21,7 +21,7 @@ activities = [
         "status": "In Progress",
     },
 ]
-data = {"user_id": "f2debf4c-511e-4ac1-879e-6581c0bfeed6", "activities": activities}
+data = {"user_id": "b945a7c8-171f-454f-b6f8-e42d778fd889", "activities": activities}
 
 
 # Send to Single Translate

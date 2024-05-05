@@ -13,7 +13,8 @@ async def init_app_state(state: State):
     state.config = load_config_from_env(env=state.env.get("ENVIRONMENT"))
 
     # Init RDS DB Access Layer
-    state.supabase_client = await create_supabase_client(state.env.get("SUPABASE_URL"), state.env.get("SUPABASE_KEY"))
+    state.supabase_client = await create_supabase_client(state.env.get("SUPABASE_URL"),
+                                                                state.env.get("SUPABASE_KEY"),)
 
     # Init Cohere connector
     state.cohere_client = await create_cohere_client(state)

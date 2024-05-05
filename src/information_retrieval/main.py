@@ -11,7 +11,7 @@ from information_retrieval.api.api_v1.model.activity import UserActivities
 from information_retrieval.api.api_v1.model.users import NarrativeUser
 from information_retrieval.app_lifespan_management import init_app_state, cleanup_app_state
 from information_retrieval.connectors.supabase.crud import \
-    get_user_by_id, insert_new_user_activity
+    get_user_email_by_id, insert_new_user_activities
 from information_retrieval.utils.standard_logger import get_logger
 
 logger = get_logger()
@@ -44,7 +44,7 @@ async def health_check():
 async def get_user_data(user_id: str, request: Request) -> Dict:
     logger.debug("New request to /users/{user_id} endpoint")
     try:
-        user: NarrativeUser = await get_user_by_id(request.app.state.supabase_client, user_id)
+        user: NarrativeUser = await get_user_email_by_id(request.app.state.supabase_client, user_id)
         return dict(user)
 
     except Exception as e:
@@ -56,7 +56,7 @@ async def get_user_data(user_id: str, request: Request) -> Dict:
 async def insert_document(data: UserActivities, request: Request):
     logger.debug("New request to /api-v1/insert/insertActivities/ endpoint")
     try:
-        await insert_new_user_activity(
+        await insert_new_user_activities(
             supabase=request.app.state.supabase_client,
             user_id=data.user_id,
             activities=data.activities
@@ -68,8 +68,6 @@ async def insert_document(data: UserActivities, request: Request):
 
 
 # @app.post("/api-v1/activities/getActivitiesForUser/")
-
-
 
 if __name__ == "__main__":
     uvicorn.run(app)
