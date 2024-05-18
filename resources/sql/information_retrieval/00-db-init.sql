@@ -82,8 +82,8 @@ CREATE TABLE activities (
 
 CREATE TABLE brag_docs (
     id                      uuid            NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
+    url                     text            UNIQUE NOT NULL,
     user_id                 uuid            NOT NULL REFERENCES profiles(id),
-    version_number          integer         NOT NULL,
     data                    jsonb           NOT NULL DEFAULT '{}'::jsonb,
     created_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),
     updated_on              timestamptz(3)  NOT NULL DEFAULT (now() at time zone 'utc'),

@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
 class Activity(BaseModel):
+    id: Optional[str]
     title: str
     description: str
     category: str
