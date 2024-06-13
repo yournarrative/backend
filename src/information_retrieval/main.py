@@ -7,13 +7,15 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 import uvicorn
 
-from information_retrieval.api.api_v1.model.activity import UserActivities, Activity
+from information_retrieval.api.api_v1.model.activity import InsertActivitiesForUserRequest, Activity, ActivityWithID
 from information_retrieval.api.api_v1.model.brag_doc import BragDoc, BragDocUpdateRequest
+from information_retrieval.api.api_v1.model.checkin import CheckIn
 from information_retrieval.api.api_v1.model.users import NarrativeUser
+from information_retrieval.api.api_v1.processing.checkin import create_activities_from_check_in
 from information_retrieval.app_lifespan_management import init_app_state, cleanup_app_state
 from information_retrieval.connectors.supabase.crud import \
     get_user_email_by_id, insert_new_user_activities, get_activities_by_user_id, \
-    create_brag_doc, get_brag_doc_data, update_brag_doc
+    create_brag_doc, get_brag_doc_data, update_brag_doc, update_activity_by_id
 from information_retrieval.utils.standard_logger import get_logger
 
 logger = get_logger()
@@ -57,7 +59,7 @@ async def get_user_data(user_id: str, request: Request) -> NarrativeUser:
 
 insert_activities_endpoint = "/api-v1/activities/insertActivities/"
 @app.post(insert_activities_endpoint)
-async def insert_activities(data: UserActivities, request: Request):
+async def insert_activities(data: InsertActivitiesForUserRequest, request: Request):
     logger.debug(f"New request to {insert_activities_endpoint} endpoint")
     try:
         await insert_new_user_activities(
@@ -73,14 +75,29 @@ async def insert_activities(data: UserActivities, request: Request):
 
 get_activities_endpoint = "/api-v1/activities/getActivitiesForUser/{user_id}"
 @app.get(get_activities_endpoint)
-async def get_activities_for_user(user_id: str, request: Request) -> List[Activity]:
+async def get_activities_for_user(user_id: str, request: Request) -> List[ActivityWithID]:
     logger.debug(f"New request to {get_activities_endpoint} endpoint")
     try:
-        activities: List[Activity] = await get_activities_by_user_id(
+        activities: List[ActivityWithID] = await get_activities_by_user_id(
             supabase=request.app.state.supabase_client,
             user_id=user_id,
         )
         return activities
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500)
+
+
+update_activity_endpoint = "/api-v1/activities/updateActivity/"
+@app.post(update_activity_endpoint)
+async def update_activity(data: ActivityWithID, request: Request):
+    logger.debug(f"New request to {update_activity_endpoint} endpoint")
+    try:
+        await update_activity_by_id(
+            supabase=request.app.state.supabase_client,
+            activity_with_id=data,
+        )
+        return Response(status_code=200)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)
@@ -135,6 +152,20 @@ async def update_brag_doc_for_user(brag_doc_update_request: BragDocUpdateRequest
                 update_request=brag_doc_update_request,
             )
         return Response(status_code=200)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500)
+
+
+create_activities_from_check_in_endpoint = "/api-v1/brag-doc/createActivitiesFromCheckIn/"
+@app.post(create_activities_from_check_in_endpoint)
+async def create_tasks_from_check_in(check_in: CheckIn, request: Request):
+    logger.debug(f"New request to {create_activities_from_check_in_endpoint} endpoint")
+    try:
+        activities: List[Activity] = create_activities_from_check_in(
+            check_in=check_in,
+            state=request.app.state)
+        return activities
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)

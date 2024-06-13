@@ -63,6 +63,7 @@ requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 cohere = "^4.50"
 supabase = "^2.4.3"
+marvin = "^2.3.4"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=3.5.0"

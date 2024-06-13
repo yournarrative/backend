@@ -1,3 +1,4 @@
+import marvin
 from starlette.datastructures import State
 
 from information_retrieval.connectors.cohere.client import create_cohere_client
@@ -18,6 +19,12 @@ async def init_app_state(state: State):
 
     # Init Cohere connector
     state.cohere_client = await create_cohere_client(state)
+
+    init_marvin_api_key(state)
+
+
+def init_marvin_api_key(state: State):
+    marvin.settings.openai.api_key = state.env.get("OPENAI_API_KEY")
 
 
 async def cleanup_app_state(state: State):

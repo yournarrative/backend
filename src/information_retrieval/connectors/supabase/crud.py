@@ -3,7 +3,7 @@ from typing import List
 from postgrest import APIResponse
 from supabase import Client
 
-from information_retrieval.api.api_v1.model.activity import Activity
+from information_retrieval.api.api_v1.model.activity import Activity, ActivityWithID
 from information_retrieval.api.api_v1.model.brag_doc import BragDoc, BragDocUpdateRequest
 from information_retrieval.api.api_v1.model.users import NarrativeUser
 from information_retrieval.utils.other import generate_random_string
@@ -30,7 +30,7 @@ async def get_user_email_by_id(supabase: Client, user_id: str) -> NarrativeUser:
         raise e
 
 
-async def get_activities_by_user_id(supabase: Client, user_id: str) -> List[Activity]:
+async def get_activities_by_user_id(supabase: Client, user_id: str) -> List[ActivityWithID]:
     logger.debug(f"Getting all documents for user: {user_id}")
     try:
         response: APIResponse = (
@@ -44,16 +44,33 @@ async def get_activities_by_user_id(supabase: Client, user_id: str) -> List[Acti
         activities = []
         for r in response.data:
             activities.append(
-                Activity(id=r.get("id"),
-                         title=r.get("title"),
-                         description=r.get("description"),
-                         category=r.get("category"),
-                         status=r.get("status"))
+                ActivityWithID(id=r.get("id"),
+                               title=r.get("title"),
+                               description=r.get("description"),
+                               category=r.get("category"),
+                               status=r.get("status"))
             )
         return activities
     except Exception as e:
         logger.error(f"Error getting all documents for user: {user_id}, error: {e}")
         raise e
+
+
+async def update_activity_by_id(supabase: Client, activity_with_id: ActivityWithID):
+    logger.debug(f"Updating activity for activity_id: {activity_with_id.id}")
+    try:
+        data, count = (
+            supabase
+                .table("activities")
+                .update(activity_with_id.dict())
+                .eq("id", activity_with_id.id)
+                .execute()
+        )
+    except Exception as e:
+        logger.error(f"Error updating activity for activity_id: {activity_with_id.id}, error: {e}")
+        raise e
+    else:
+        logger.debug(f"Successfully updated activity for activity_id: {activity_with_id.id}")
 
 
 async def insert_new_user_activities(supabase: Client, user_id: str, activities: List[Activity]):
