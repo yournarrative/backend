@@ -1134,6 +1134,20 @@ files = [
 ]
 
 [[package]]
+name = "ping3"
+version = "4.0.8"
+description = "A pure python3 version of ICMP ping implementation using raw socket."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "ping3-4.0.8-py3-none-any.whl", hash = "sha256:b5c294851968b4229e9af69d252778241cb84221594b436a8677419c31925594"},
+    {file = "ping3-4.0.8.tar.gz", hash = "sha256:9ab460eb57f006b71f977a693d157215aabd6bbcbc6cd6428b6951eaae0c2875"},
+]
+
+[package.extras]
+dev = ["build", "twine"]
+
+[[package]]
 name = "platformdirs"
 version = "4.2.1"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -2149,4 +2163,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "af9d64c1204ed568a0ef6531cf8eb019dd2a0b8314216b0e20285fbf61137062"
+content-hash = "768553d8898cd306fa6bf0fe27a49b46498d5a26541c95f25556793f3a0bf6a7"

@@ -10,16 +10,17 @@ async def init_app_state(state: State):
     # Load env variables
     state.env = load_env()
 
-    import subprocess
+    from ping3 import ping, verbose_ping
 
     def ping_google():
         try:
-            # Ping Google's DNS server
-            output = subprocess.check_output(["ping", "-c", "4", "8.8.8.8"], universal_newlines=True)
-            return output
-        except subprocess.CalledProcessError as e:
+            response_time = ping('8.8.8.8')
+            if response_time is None:
+                return "Ping failed. No response."
+            else:
+                return f"Ping successful. Response time: {response_time} ms"
+        except Exception as e:
             return f"Ping failed with error: {e}"
-
     result = ping_google()
     print(result)
     # Load config
