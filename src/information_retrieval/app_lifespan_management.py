@@ -14,7 +14,7 @@ async def init_app_state(state: State):
 
     def ping_google():
         try:
-            response_time = ping('8.8.8.8')
+            response_time = ping('google.com')
             if response_time is None:
                 return "Ping failed. No response."
             else:
