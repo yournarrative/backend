@@ -8,6 +8,7 @@ logger = get_logger()
 
 async def create_supabase_client(url: str, key: str) -> Client:
     logger.debug(f"Creating supabase connector for url: {url}")
+    logger.debug(f"Creating supabase connector for key: {key}")
     try:
         client: Client = create_client(url, key)
     except Exception as e:
