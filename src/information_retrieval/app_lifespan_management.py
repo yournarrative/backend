@@ -10,17 +10,18 @@ async def init_app_state(state: State):
     # Load env variables
     state.env = load_env()
 
-    debug_request()
-
     # Load config
-    state.config = load_config_from_env(env=state.env.get("ENVIRONMENT"))
+    state.config = load_config_from_env(
+        env=state.env.get("ENVIRONMENT"),
+    )
 
-    # Init RDS DB Access Layer
-    state.supabase_client = await create_supabase_client(state.env.get("SUPABASE_URL"),
-                                                         state.env.get("SUPABASE_KEY"),)
+    state.cohere_client = await create_cohere_client(
+        state=state,
+    )
 
-    # Init Cohere connector
-    state.cohere_client = await create_cohere_client(state)
+    state.supabase_client = await create_supabase_client(
+        url=state.env.get("SUPABASE_URL"), key=state.env.get("SUPABASE_KEY"),
+    )
 
     init_marvin_api_key(state)
 
@@ -31,20 +32,3 @@ def init_marvin_api_key(state: State):
 
 async def cleanup_app_state(state: State):
     pass
-
-def debug_request():
-    import requests
-
-    # URL of the public website
-    url = "https://www.wikipedia.org/"
-
-    # Sending a GET request
-    response = requests.get(url)
-
-    # Checking if the request was successful
-    if response.status_code == 200:
-        print("Request was successful!")
-        # Printing the content of the response
-        print(response.text)
-    else:
-        print(f"Failed to retrieve content. Status code: {response.status_code}")
