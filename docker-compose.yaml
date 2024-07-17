@@ -10,7 +10,7 @@ services:
     ports:
       - 5001:5001
     env_file:
-      - resources/config/prod/.env
+      - resources/config/local/.env
     networks:
       - mynetwork
 

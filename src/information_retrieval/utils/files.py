@@ -10,7 +10,7 @@ logger = get_logger()
 def load_env() -> Dict[str, str]:
     logger.debug("Loading env variables...")
     env = dict(os.environ)
-    logger.debug(f"Env variables loaded: {env}")
+    logger.debug(f"Env variables loaded.")
     return env
 
 

@@ -10,19 +10,8 @@ async def init_app_state(state: State):
     # Load env variables
     state.env = load_env()
 
-    from ping3 import ping, verbose_ping
+    debug_request()
 
-    def ping_google():
-        try:
-            response_time = ping('google.com')
-            if response_time is None:
-                return "Ping failed. No response."
-            else:
-                return f"Ping successful. Response time: {response_time} ms"
-        except Exception as e:
-            return f"Ping failed with error: {e}"
-    result = ping_google()
-    print(result)
     # Load config
     state.config = load_config_from_env(env=state.env.get("ENVIRONMENT"))
 
@@ -42,3 +31,20 @@ def init_marvin_api_key(state: State):
 
 async def cleanup_app_state(state: State):
     pass
+
+def debug_request():
+    import requests
+
+    # URL of the public website
+    url = "https://www.wikipedia.org/"
+
+    # Sending a GET request
+    response = requests.get(url)
+
+    # Checking if the request was successful
+    if response.status_code == 200:
+        print("Request was successful!")
+        # Printing the content of the response
+        print(response.text)
+    else:
+        print(f"Failed to retrieve content. Status code: {response.status_code}")
