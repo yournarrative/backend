@@ -6,7 +6,7 @@ from information_retrieval.utils.standard_logger import get_logger
 logger = get_logger()
 
 
-async def create_supabase_client(url: str, key: str) -> Client:
+def create_supabase_client(url: str, key: str) -> Client:
     logger.debug(f"Creating supabase connector for url: {url}")
     logger.debug(f"Creating supabase connector for key: {key}")
     try:

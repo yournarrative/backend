@@ -15,11 +15,11 @@ async def init_app_state(state: State):
         env=state.env.get("ENVIRONMENT"),
     )
 
-    state.cohere_client = await create_cohere_client(
+    state.cohere_client = create_cohere_client(
         state=state,
     )
 
-    state.supabase_client = await create_supabase_client(
+    state.supabase_client = create_supabase_client(
         url=state.env.get("SUPABASE_URL"), key=state.env.get("SUPABASE_KEY"),
     )
 

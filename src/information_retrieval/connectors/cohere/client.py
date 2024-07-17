@@ -6,7 +6,7 @@ from information_retrieval.utils.standard_logger import get_logger
 logger = get_logger()
 
 
-async def create_cohere_client(state: State) -> cohere.Client:
+def create_cohere_client(state: State) -> cohere.Client:
     logger.debug(f"Creating Cohere client...")
     cohere_api_key = state.env.get("COHERE_API_KEY")
 
