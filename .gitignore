@@ -190,4 +190,4 @@ tmp
 resources/audio
 audio/static/
 **.DS_Store
-**/.env
+**/*.env
