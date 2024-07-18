@@ -1,17 +1,19 @@
 import cohere
-from starlette.datastructures import State
 
 from information_retrieval.utils.standard_logger import get_logger
 
 logger = get_logger()
 
 
-def create_cohere_client(state: State) -> cohere.Client:
+def create_cohere_client(api_key: str) -> cohere.Client:
     logger.debug(f"Creating Cohere client...")
-    cohere_api_key = state.env.get("COHERE_API_KEY")
+
+    if not api_key:
+        logger.error("API key not provided.")
+        raise ValueError("API key not provided")
 
     try:
-        co: cohere.Client = cohere.Client(cohere_api_key)
+        co: cohere.Client = cohere.Client(api_key)
     except Exception as e:
         logger.error(f"Failed to create Cohere client: {e}")
         raise e
