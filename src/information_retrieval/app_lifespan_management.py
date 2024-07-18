@@ -48,7 +48,7 @@ def request():
             print("Status Code:", response.status_code)
             print("Content Type:", response.headers['Content-Type'])
             # Print a portion of the content for demonstration purposes
-            print("Content:", response.text[:500])  # Print the first 500 characters
+            print("Content:", response.text[:10])
         except requests.exceptions.RequestException as e:
             print(f"Error fetching the Wikipedia main page: {e}")
 

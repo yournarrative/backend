@@ -10,4 +10,4 @@ else:
 worker_class = "uvicorn.workers.UvicornWorker"
 reload = True
 reload_engine = "auto"
-timeout = 30
+timeout = 300
