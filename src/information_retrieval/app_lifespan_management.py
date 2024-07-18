@@ -66,8 +66,5 @@ def debug_test():
             print(f"Error resolving DNS for {url}: {e}")
 
     resolve_dns("google.com")
-    resolve_dns("https://google.com")
     resolve_dns("wikipedia.com")
-    resolve_dns("https://wikipedia.com")
     resolve_dns("nkdjutovalclevvlnagr.supabase.co")
-    resolve_dns("https://nkdjutovalclevvlnagr.supabase.co")
