@@ -15,6 +15,8 @@ async def init_app_state(state: State):
         env=state.env.get("ENVIRONMENT"),
     )
 
+    debug_test()
+
     state.cohere_client = create_cohere_client(
         state=state,
     )
@@ -32,3 +34,21 @@ def init_marvin_api_key(state: State):
 
 async def cleanup_app_state(state: State):
     pass
+
+
+def debug_test():
+    import socket
+
+    def resolve_dns(url):
+        try:
+            result = socket.gethostbyname(url)
+            print(f"DNS resolution for {url}: {result}")
+        except socket.gaierror as e:
+            print(f"Error resolving DNS for {url}: {e}")
+
+    resolve_dns("google.com")
+    resolve_dns("https://google.com")
+    resolve_dns("wikipedia.com")
+    resolve_dns("https://wikipedia.com")
+    resolve_dns("nkdjutovalclevvlnagr.supabase.co")
+    resolve_dns("https://nkdjutovalclevvlnagr.supabase.co")
