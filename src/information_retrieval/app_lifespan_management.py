@@ -14,7 +14,7 @@ async def init_app_state(state: State):
     state.config = load_config_from_env(
         env=state.env.get("ENVIRONMENT"),
     )
-
+    request()
     debug_test()
 
     state.cohere_client = create_cohere_client(
@@ -34,6 +34,25 @@ def init_marvin_api_key(state: State):
 
 async def cleanup_app_state(state: State):
     pass
+
+
+def request():
+    import requests
+
+    def fetch_wikipedia_main_page():
+        url = "https://en.wikipedia.org/wiki/Main_Page"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            print("Successfully fetched the Wikipedia main page.")
+            print("Status Code:", response.status_code)
+            print("Content Type:", response.headers['Content-Type'])
+            # Print a portion of the content for demonstration purposes
+            print("Content:", response.text[:500])  # Print the first 500 characters
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching the Wikipedia main page: {e}")
+
+    fetch_wikipedia_main_page()
 
 
 def debug_test():
