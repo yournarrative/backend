@@ -32,7 +32,7 @@ app = FastAPI(title="Narrative", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://yournarrative.io", "http://localhost"],
+    allow_origins=["https://yournarrative.io", "http://localhost", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
