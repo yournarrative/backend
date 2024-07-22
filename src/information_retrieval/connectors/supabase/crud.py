@@ -6,7 +6,7 @@ from supabase import Client
 from information_retrieval.api.api_v1.model.activity import Activity, ActivityWithID
 from information_retrieval.api.api_v1.model.brag_doc import BragDoc, BragDocUpdateRequest
 from information_retrieval.api.api_v1.model.users import NarrativeUser
-from information_retrieval.utils.other import generate_random_string
+from information_retrieval.utils.misc import generate_random_string
 from information_retrieval.utils.standard_logger import get_logger
 
 logger = get_logger()

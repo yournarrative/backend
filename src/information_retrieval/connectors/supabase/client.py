@@ -8,7 +8,6 @@ logger = get_logger()
 
 def create_supabase_client(url: str, key: str) -> Client:
     logger.debug(f"Creating supabase connector for url: {url}")
-    logger.debug(f"Creating supabase connector for key: {key}")
 
     if not url or not key:
         logger.error("URL or key not provided.")

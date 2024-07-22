@@ -1,2 +1,3 @@
-s3:
-  interviews_bucket: ghosted-interviews-prod
+ALLOWED_ORIGINS:
+  - https://www.narrative.io
+  - https://narrative.io

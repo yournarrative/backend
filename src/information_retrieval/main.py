@@ -5,7 +5,6 @@ from typing import List
 from fastapi import FastAPI, HTTPException, Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-import uvicorn
 
 from information_retrieval.api.api_v1.model.activity import InsertActivitiesForUserRequest, Activity, ActivityWithID
 from information_retrieval.api.api_v1.model.brag_doc import BragDoc, BragDocUpdateRequest
@@ -13,26 +12,29 @@ from information_retrieval.api.api_v1.model.checkin import CheckIn
 from information_retrieval.api.api_v1.model.users import NarrativeUser
 from information_retrieval.api.api_v1.processing.checkin import create_activities_from_check_in
 from information_retrieval.app_lifespan_management import init_app_state, cleanup_app_state
+from information_retrieval.config import settings
 from information_retrieval.connectors.supabase.crud import \
     get_user_email_by_id, insert_new_user_activities, get_activities_by_user_id, \
     create_brag_doc, get_brag_doc_data, update_brag_doc, update_activity_by_id
 from information_retrieval.utils.standard_logger import get_logger
+
 
 logger = get_logger()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_app_state(app.state)
+    await init_app_state(app)
     yield
-    await cleanup_app_state(app.state)
+    await cleanup_app_state(app)
 
 
 app = FastAPI(title="Narrative", lifespan=lifespan)
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://yournarrative.io", "http://localhost"],
+    allow_origins=settings.config.get("ALLOWED_ORIGINS"),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -169,7 +171,3 @@ async def create_tasks_from_check_in(check_in: CheckIn, request: Request):
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)
-
-
-if __name__ == "__main__":
-    uvicorn.run(app)

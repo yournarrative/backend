@@ -1,8 +1,9 @@
 from typing import Dict, Any
-import os, os.path
+import os
 import yaml
 
 from information_retrieval.utils.standard_logger import get_logger
+
 
 logger = get_logger()
 
@@ -15,8 +16,9 @@ def load_env() -> Dict[str, str]:
 
 
 def load_config_from_env(env: str) -> Dict[str, Any]:
-    logger.debug(f"Loading config from env: {env}...")
+    logger.debug(f"Loading config from env: {env}")
     env = env.replace('"', '')
     with open(f"resources/config/{env}/conf.yaml", "r") as config_file:
         config = yaml.safe_load(config_file)
+    logger.debug(f"Config loaded: {config}")
     return config
