@@ -1,12 +1,10 @@
 import cohere
 
-from information_retrieval.utils.standard_logger import get_logger
-
-logger = get_logger()
+from information_retrieval.utils.standard_logger import app_logger as logger
 
 
 def create_cohere_client(api_key: str) -> cohere.Client:
-    logger.debug(f"Creating Cohere client...")
+    logger.debug("Creating Cohere client...")
 
     if not api_key:
         logger.error("API key not provided.")

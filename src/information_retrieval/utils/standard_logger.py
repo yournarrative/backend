@@ -8,3 +8,6 @@ def get_logger(name: str = "app-logger", level: int = logging.DEBUG) -> logging.
     logger = logging.getLogger(name)
     logger.setLevel(level)
     return logger
+
+
+app_logger = get_logger()

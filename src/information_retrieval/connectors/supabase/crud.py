@@ -7,23 +7,14 @@ from information_retrieval.api.api_v1.model.activity import Activity, ActivityWi
 from information_retrieval.api.api_v1.model.brag_doc import BragDoc, BragDocUpdateRequest
 from information_retrieval.api.api_v1.model.users import NarrativeUser
 from information_retrieval.utils.misc import generate_random_string
-from information_retrieval.utils.standard_logger import get_logger
-
-logger = get_logger()
+from information_retrieval.utils.standard_logger import app_logger as logger
 
 
 async def get_user_email_by_id(supabase: Client, user_id: str) -> NarrativeUser:
     logger.debug(f"Getting all documents for user: {user_id}")
     try:
-        response: APIResponse = (
-            supabase
-                .table("profiles")
-                .select("id, email")
-                .eq("id", user_id)
-                .execute()
-        )
-        user = NarrativeUser(id=response.data[0].get("id"),
-                             email=response.data[0].get("email"))
+        response: APIResponse = supabase.table("profiles").select("id, email").eq("id", user_id).execute()
+        user = NarrativeUser(id=response.data[0].get("id"), email=response.data[0].get("email"))
         return user
     except Exception as e:
         logger.error(f"Error getting all documents for user: {user_id}, error: {e}")
@@ -34,21 +25,22 @@ async def get_activities_by_user_id(supabase: Client, user_id: str) -> List[Acti
     logger.debug(f"Getting all documents for user: {user_id}")
     try:
         response: APIResponse = (
-            supabase
-                .table("activities")
-                .select("id, title, description, category, status")
-                .eq("user_id", user_id)
-                .execute()
+            supabase.table("activities")
+            .select("id, title, description, category, status")
+            .eq("user_id", user_id)
+            .execute()
         )
 
         activities = []
         for r in response.data:
             activities.append(
-                ActivityWithID(id=r.get("id"),
-                               title=r.get("title"),
-                               description=r.get("description"),
-                               category=r.get("category"),
-                               status=r.get("status"))
+                ActivityWithID(
+                    id=r.get("id"),
+                    title=r.get("title"),
+                    description=r.get("description"),
+                    category=r.get("category"),
+                    status=r.get("status"),
+                )
             )
         return activities
     except Exception as e:
@@ -56,15 +48,11 @@ async def get_activities_by_user_id(supabase: Client, user_id: str) -> List[Acti
         raise e
 
 
-async def update_activity_by_id(supabase: Client, activity_with_id: ActivityWithID):
+async def upsert_activity_by_id(supabase: Client, activity_with_id: ActivityWithID):
     logger.debug(f"Updating activity for activity_id: {activity_with_id.id}")
     try:
         data, count = (
-            supabase
-                .table("activities")
-                .update(activity_with_id.dict())
-                .eq("id", activity_with_id.id)
-                .execute()
+            supabase.table("activities").update(activity_with_id.dict()).eq("id", activity_with_id.id).execute()
         )
     except Exception as e:
         logger.error(f"Error updating activity for activity_id: {activity_with_id.id}, error: {e}")
@@ -80,15 +68,10 @@ async def insert_new_user_activities(supabase: Client, user_id: str, activities:
         data_to_upsert = []
         for activity in activities:
             d = dict(activity)
-            d['user_id'] = user_id
+            d["user_id"] = user_id
             data_to_upsert.append(d)
 
-        data, count = (
-            supabase
-                .table("activities")
-                .upsert(data_to_upsert)
-                .execute()
-        )
+        data, count = supabase.table("activities").upsert(data_to_upsert).execute()
     except Exception as e:
         logger.error(f"Error uploading activities for user: {user_id}, error: {e}")
         raise e
@@ -99,13 +82,7 @@ async def insert_new_user_activities(supabase: Client, user_id: str, activities:
 async def is_brag_doc_url_taken(supabase: Client, url: str) -> bool:
     logger.debug(f"Checking if brag doc url is taken: {url}")
     try:
-        response: APIResponse = (
-            supabase
-                .table('brag_docs')
-                .select('url')
-                .eq('url', url.strip())
-                .execute()
-        )
+        response: APIResponse = supabase.table("brag_docs").select("url").eq("url", url.strip()).execute()
         return bool(response.data)
     except Exception as e:
         logger.error(f"Error checking if brag doc url is taken: {url}, error: {e}")
@@ -116,17 +93,15 @@ async def get_brag_doc_data(supabase: Client, user_id: str) -> BragDoc:
     logger.debug(f"Getting brag doc for user: {user_id}")
     try:
         response: APIResponse = (
-            supabase
-                .table('brag_docs')
-                .select('user_id, url, data, id')
-                .eq('user_id', user_id)
-                .execute()
+            supabase.table("brag_docs").select("user_id, url, data, id").eq("user_id", user_id).execute()
         )
         unpack = response.data[0] if response.data else {}
-        brag_doc = BragDoc(user_id=unpack.get("user_id", ""),
-                           url=unpack.get("url", ""),
-                           published=unpack.get("data", {}).get("published", False),
-                           brag_doc_id=unpack.get("id", ""),)
+        brag_doc = BragDoc(
+            user_id=unpack.get("user_id", ""),
+            url=unpack.get("url", ""),
+            published=unpack.get("data", {}).get("published", False),
+            brag_doc_id=unpack.get("id", ""),
+        )
         return brag_doc
     except Exception as e:
         logger.error(f"Error getting brag doc for user: {user_id}, error: {e}")
@@ -149,12 +124,7 @@ async def create_brag_doc(supabase: Client, update_request: BragDocUpdateRequest
                 continue
 
             else:
-                response: APIResponse = (
-                    supabase
-                        .table('brag_docs')
-                        .insert(d)
-                        .execute()
-                )
+                response: APIResponse = supabase.table("brag_docs").insert(d).execute()
                 break
 
     except Exception as e:
@@ -171,13 +141,37 @@ async def update_brag_doc(supabase: Client, update_request: BragDocUpdateRequest
     }
 
     try:
-        response: APIResponse = (
-            supabase
-                .table('brag_docs')
-                .update(d)
-                .eq('user_id', update_request.user_id)
-                .execute()
-        )
+        response: APIResponse = supabase.table("brag_docs").update(d).eq("user_id", update_request.user_id).execute()
     except Exception as e:
         logger.error(f"Error updating brag doc for user: {update_request.user_id}, error: {e}")
+        raise e
+
+
+async def get_activity_details_by_id(supabase: Client, activity_id: str) -> ActivityWithID:
+    # TODO get user id too and validate they own this activity?
+
+    logger.debug(f"Getting activity details for activity_id: {activity_id}")
+    try:
+        response: APIResponse = (
+            supabase.table("activities")
+            .select("id, title, description, category, status")
+            .eq("id", activity_id)
+            .execute()
+        )
+
+        r = response.data[0]
+
+        if not response.data or not response.data[0]:
+            raise Exception(f"Activity with id: {activity_id} not found")
+
+        activity_with_id = ActivityWithID(
+            id=r.get("id"),
+            title=r.get("title"),
+            description=r.get("description"),
+            category=r.get("category"),
+            status=r.get("status"),
+        )
+        return activity_with_id
+    except Exception as e:
+        logger.error(f"Error getting activity details for activity_id: {activity_id}, error: {e}")
         raise e

@@ -4,14 +4,11 @@ from fastapi import FastAPI
 from information_retrieval.config import settings
 from information_retrieval.connectors.cohere.client import create_cohere_client
 from information_retrieval.connectors.supabase.client import create_supabase_client
-from information_retrieval.utils.standard_logger import get_logger
+from information_retrieval.utils.standard_logger import app_logger as logger
 
 
-logger = get_logger()
-
-
+# TODO: figure out proper dependency injection for this
 async def init_app_state(app: FastAPI):
-
     app.state.settings = settings
 
     app.state.cohere_client = create_cohere_client(
@@ -23,9 +20,7 @@ async def init_app_state(app: FastAPI):
         key=app.state.settings.env_vars.get("SUPABASE_KEY", ""),
     )
 
-    init_marvin_api_key(
-        api_key=app.state.settings.env_vars.get("OPENAI_API_KEY", "")
-    )
+    init_marvin_api_key(api_key=app.state.settings.env_vars.get("OPENAI_API_KEY", ""))
 
 
 def init_marvin_api_key(api_key: str):

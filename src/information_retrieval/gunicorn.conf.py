@@ -1,9 +1,7 @@
 import multiprocessing
 import os
 
-from information_retrieval.utils.standard_logger import get_logger
-
-logger = get_logger()
+from information_retrieval.utils.standard_logger import app_logger as logger
 
 bind = os.getenv("HOST") + ":" + os.getenv("PORT")
 if os.environ.get("ENVIRONMENT") == "local":

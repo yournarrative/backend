@@ -1,14 +1,21 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
 class Activity(BaseModel):
     title: str = Field(..., description="The inferred title of this activity, summarizing what it's about.")
     description: str = Field(..., description="The description of this activity. What has the person said about it?")
-    category: str = Field(..., description="The category of this activity. Choices are ['Skill', 'Achievement', 'Endorsement', 'Miscellaneous']")
-    status: str = Field(..., description="The status of this activity. Choices are ['Not Started', 'In Progress', 'Completed', 'Archived']")
+    category: str = Field(
+        ...,
+        description="The category of this activity. "
+        "Choices are ['Skill', 'Achievement', 'Endorsement', 'Miscellaneous']",
+    )
+    status: str = Field(
+        ...,
+        description="The status of this activity. "
+        "Choices are ['Not Started', 'In Progress', 'Completed', 'Archived']",
+    )
 
 
 class ActivityWithID(Activity):

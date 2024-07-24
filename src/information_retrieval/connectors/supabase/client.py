@@ -1,9 +1,6 @@
-from supabase import create_client, Client
+from supabase import Client, create_client
 
-from information_retrieval.utils.standard_logger import get_logger
-
-
-logger = get_logger()
+from information_retrieval.utils.standard_logger import app_logger as logger
 
 
 def create_supabase_client(url: str, key: str) -> Client:
