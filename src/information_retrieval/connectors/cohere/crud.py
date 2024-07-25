@@ -4,7 +4,7 @@
 # from starlette.datastructures import State
 #
 # from information_retrieval.api.api_v1.model.query import RAGResponse
-# from information_retrieval.utils.standard_logger import app_logger as logger
+# from information_retrieval.utils.logger import app_logger as logger
 #
 #
 # async def RAG_query(user_email: str, query: str, state: State) -> RAGResponse:

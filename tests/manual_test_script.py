@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from pprint import pprint
+
 import requests
 
 
@@ -10,7 +11,7 @@ def print_response(r, test: str, print_json=False):
     if print_json:
         pprint(r.json())
 
-    print('\n')
+    print("\n")
 
 
 def create_activities_for_user():
@@ -53,12 +54,12 @@ def get_brag_doc_for_user(user_id):
 def create_activites_from_check_in():
     data = {
         "dialogue": [
-            'Tell me about what you accomplished this week. Anything you’re proud of?',
-            'I finished a project at work to scrape all of the news websites for the latest news and display it in a dashboard. I’m proud of how it turned out. I used python and selenium.',
-            'What are you working on right now?',
-            'I\'m working on a new personal project to build an API server for a new company called Narrative. It\'s build using Python and FastAPI and Docker.'
-            'What are you learning right now?',
-            'Focusing on the catching up with the latest trends in web development and server security practices.'
+            "Tell me about what you accomplished this week. Anything you’re proud of?",
+            "I finished a project at work to scrape all of the news websites for the latest news and display it in a dashboard. I’m proud of how it turned out. I used python and selenium.",
+            "What are you working on right now?",
+            "I'm working on a new personal project to build an API server for a new company called Narrative. It's build using Python and FastAPI and Docker."
+            "What are you learning right now?",
+            "Focusing on the catching up with the latest trends in web development and server security practices.",
         ]
     }
 
@@ -74,5 +75,5 @@ def run_tests():
     create_activites_from_check_in()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_tests()

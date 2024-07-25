@@ -1,6 +1,6 @@
 import cohere
 
-from information_retrieval.utils.standard_logger import app_logger as logger
+from information_retrieval.core.logger import app_logger as logger
 
 
 def create_cohere_client(api_key: str) -> cohere.Client:
