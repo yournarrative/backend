@@ -35,22 +35,6 @@ def create_activities_for_user():
     print_response(r, "create_activities_for_user")
 
 
-def create_brag_doc(user_id):
-    data = {
-        "user_id": user_id,
-        "publish": True,
-        "url": "shayaanjagtap2",
-    }
-
-    r = requests.post("http://0.0.0.0:5001/api-v1/brag-doc/updateBragDoc/", json=data)
-    print_response(r, "create_brag_doc")
-
-
-def get_brag_doc_for_user(user_id):
-    r = requests.get(f"http://0.0.0.0:5001/api-v1/brag-doc/getBragDocForUser/{user_id}")
-    print_response(r, "get_brag_doc_for_user")
-
-
 def create_activites_from_check_in():
     data = {
         "dialogue": [

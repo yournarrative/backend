@@ -1,7 +1,7 @@
 from marvin import ai_model
 from pydantic import BaseModel
 
-from information_retrieval.api.v1.model.activities import Activity
+from information_retrieval.api.v1.models.activity import Activity
 from information_retrieval.core.logger import app_logger as logger
 
 instructions = """

@@ -1,7 +1,7 @@
 import pytest
 from integration.conftest import TEST_USER_EMAIL, TEST_USER_UUID
 
-from information_retrieval.api.v1.routers.users import get_user_data_endpoint
+from information_retrieval.api.v1.routers.user import get_user_data_endpoint
 
 
 @pytest.mark.usefixtures("setup_class_fixture")

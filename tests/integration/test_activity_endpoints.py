@@ -1,7 +1,7 @@
 import pytest
 from integration.conftest import TEST_USER_UUID
 
-from information_retrieval.api.v1.routers.activities import (
+from information_retrieval.api.v1.routers.activity import (
     delete_activities_endpoint,
     get_activities_endpoint,
     insert_activities_endpoint,

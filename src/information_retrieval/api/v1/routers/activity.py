@@ -1,8 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, Response
 
-from information_retrieval.api.v1.ai_processing.check_in import create_activities_from_check_in_ai
-from information_retrieval.api.v1.ai_processing.update_existing_activity import update_activity_with_new_details_ai
-from information_retrieval.api.v1.model.activities import (
+from information_retrieval.api.v1.models.activity import (
     Activity,
     ActivityWithID,
     CreateActivitiesFromCheckInRequest,
@@ -15,6 +13,8 @@ from information_retrieval.api.v1.model.activities import (
     UpdateActivityWithNewDetailsResponse,
     UpsertActivityRequest,
 )
+from information_retrieval.api.v1.processing.ai.check_in_to_activities import create_activities_from_check_in_ai
+from information_retrieval.api.v1.processing.ai.update_existing_activity import update_activity_with_new_details_ai
 from information_retrieval.connectors.supabase.crud import (
     get_activities_by_user_id,
     get_activity_details_by_id,

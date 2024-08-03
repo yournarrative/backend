@@ -3,9 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from information_retrieval.api.v1.routers import activities, users
+from information_retrieval.api.v1.routers import activity, resume, user
 from information_retrieval.core.config import settings
 from information_retrieval.core.lifespan import cleanup_app_state, init_app_state
+from information_retrieval.core.middleware import LimitUploadSizeMiddleware
 
 
 @asynccontextmanager
@@ -25,11 +26,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(LimitUploadSizeMiddleware)
+
 
 @app.get("/")
 async def health_check():
     return "I'm healthy, yo!"
 
 
-app.include_router(users.router)
-app.include_router(activities.router)
+app.include_router(user.router)
+app.include_router(activity.router)
+app.include_router(resume.router)

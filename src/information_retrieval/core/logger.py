@@ -1,6 +1,6 @@
 import logging
 
-formatter = "%(asctime)s %(filename)s %(lineno)d [%(levelname)s] %(message)s"
+formatter = "[%(levelname)s] %(asctime)s %(filename)s %(lineno)d %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=formatter)
 
 

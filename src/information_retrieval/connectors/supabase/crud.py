@@ -1,8 +1,8 @@
 from postgrest import APIResponse
 from supabase import Client
 
-from information_retrieval.api.v1.model.activities import Activity, ActivityWithID
-from information_retrieval.api.v1.model.users import NarrativeUser
+from information_retrieval.api.v1.models.activity import Activity, ActivityWithID
+from information_retrieval.api.v1.models.user import NarrativeUser
 from information_retrieval.core.logger import app_logger as logger
 
 

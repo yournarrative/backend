@@ -65,6 +65,8 @@ cohere = "^4.50"
 supabase = "^2.4.3"
 marvin = "^2.3.4"
 ping3 = "^4.0.8"
+pymupdf = "^1.24.9"
+python-multipart = "^0.0.9"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=3.5.0"
@@ -75,3 +77,6 @@ pytest-asyncio = "^0.23.8"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+addopts = "--capture=tee-sys --cov=src --cov-report=term-missing --disable-warnings --cov-report=html --verbose"
+log_cli = true
+log_cli_format = "[%(levelname)s] %(asctime)s %(filename)s %(lineno)d %(message)s"

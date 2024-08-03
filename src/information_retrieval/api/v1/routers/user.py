@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 
-from information_retrieval.api.v1.model.users import GetUserDataRequest, GetUserDataResponse, NarrativeUser
+from information_retrieval.api.v1.models.user import GetUserDataRequest, GetUserDataResponse, NarrativeUser
 from information_retrieval.connectors.supabase.crud import get_user_email_by_id
 from information_retrieval.core.logger import app_logger as logger
 
