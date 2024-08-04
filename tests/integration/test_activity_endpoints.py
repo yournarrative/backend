@@ -2,6 +2,7 @@ import pytest
 from integration.conftest import TEST_USER_UUID
 
 from information_retrieval.api.v1.routers.activity import (
+    create_activities_from_check_in_endpoint,
     delete_activities_endpoint,
     get_activities_endpoint,
     insert_activities_endpoint,
@@ -200,3 +201,58 @@ class TestActivitiesEndpoints:
         assert updated_activities[0]["title"] == updated_activity["activity_with_id"]["title"]
         assert updated_activities[0]["description"] == updated_activity["activity_with_id"]["description"]
         assert updated_activities[0]["status"] == updated_activity["activity_with_id"]["status"]
+
+    def test_create_activities_from_check_in(self):
+        # Mock dialogue data
+        dialogue_data = {
+            "dialogue": [
+                "What did you learn or accomplish this week?",
+                "Today I completed the unit testing for the FastAPI application for my job at Acme Corp "
+                "and started the integration testing for a personal project.",
+            ]
+        }
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        print(response)
+        print(response.json())
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert "activities" in response_data
+        assert len(response_data["activities"]) == 2
+        assert "Acme Corp" in [a["organization"] for a in response_data["activities"]]
+
+    def test_create_activities_from_check_in_empty_dialogue(self):
+        dialogue_data = {"dialogue": []}
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        assert response.status_code == 200
+        assert response.json().get("activities") == []
+
+    def test_create_activities_from_check_in_empty_strings(self):
+        dialogue_data = {"dialogue": [""]}
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        assert response.status_code == 200
+        assert response.json().get("activities") == []
+
+    def test_create_activities_from_check_in_empty_responses(self):
+        dialogue_data = {"dialogue": ["What did you learn or accomplish this week?", ""]}
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        assert response.status_code == 200
+        assert response.json().get("activities") == []
+
+    def test_create_activities_from_check_in_nonsense_dialogue(self):
+        dialogue_data = {"dialogue": ["What did you learn or accomplish recently?", " ".join(["activity"] * 1000)]}
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        assert response.status_code == 200
+        assert response.json().get("activities") == []
+
+    def test_create_activities_from_check_in_ambiguous_dialogue(self):
+        dialogue_data = {"dialogue": ["What did you learn or accomplish recently?", "I did a lot of stuff today."]}
+
+        response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
+        assert response.status_code == 200
+        assert response.json().get("activities") == []

@@ -6,23 +6,61 @@ from information_retrieval.api.v1.models.user import NarrativeUser
 from information_retrieval.core.logger import app_logger as logger
 
 
-async def get_user_email_by_id(supabase: Client, user_id: str) -> NarrativeUser:
-    logger.debug(f"Getting all documents for user: {user_id}")
+async def get_user_profile_data_by_id(supabase: Client, user_id: str) -> NarrativeUser:
+    logger.debug(f"Getting all profile data for user: {user_id}")
     try:
-        response: APIResponse = supabase.table("profiles").select("id, email").eq("id", user_id).execute()
-        user = NarrativeUser(user_id=response.data[0].get("id"), email=response.data[0].get("email"))
+        response: APIResponse = supabase.table("profiles").select("*").eq("id", user_id).execute()
+        user = NarrativeUser(
+            user_id=response.data[0].get("id"),
+            email=response.data[0].get("email"),
+            phone_number=response.data[0].get("phone_number", None),
+            bio=response.data[0].get("bio", None),
+            linkedin_profile_url=response.data[0].get("linkedin_profile_url", None),
+            current_organization=response.data[0].get("current_organization", None),
+        )
         return user
     except Exception as e:
         logger.error(f"Error getting all documents for user: {user_id}, error: {e}")
         raise e
 
 
+async def update_user_profile_data_by_id(supabase: Client, user: NarrativeUser):
+    logger.debug(f"Updating user profile for user_id: {user.user_id}")
+
+    user_data_dict = user.dict()
+    del user_data_dict["user_id"]
+
+    try:
+        _, _ = supabase.table("profiles").update(user_data_dict).eq("id", user.user_id).execute()
+    except Exception as e:
+        logger.error(f"Error updating user profile for user_id: {user.user_id}, error: {e}")
+        raise e
+    else:
+        logger.debug(f"Successfully updated user profile for id: {user.user_id} to {user}")
+
+
+async def get_all_organizations_for_user_by_id(supabase: Client, user_id: str) -> list[str]:
+    logger.debug(f"Getting all organizations for user: {user_id}")
+    try:
+        response: APIResponse = (
+            supabase.table("activities").select("organization").eq("user_id", user_id).eq("deleted", False).execute()
+        )
+
+        organizations = []
+        for r in response.data:
+            organizations.append(r.get("organization"))
+        return organizations
+    except Exception as e:
+        logger.error(f"Error getting all documents for user: {user_id}, error: {e}")
+        raise e
+
+
 async def get_activities_by_user_id(supabase: Client, user_id: str) -> list[ActivityWithID]:
-    logger.debug(f"Getting all documents for user: {user_id}")
+    logger.debug(f"Getting all activities for user: {user_id}")
     try:
         response: APIResponse = (
             supabase.table("activities")
-            .select("id, title, description, category, status")
+            .select("id, title, description, category, status, organization")
             .eq("user_id", user_id)
             .eq("deleted", False)
             .execute()
@@ -37,11 +75,12 @@ async def get_activities_by_user_id(supabase: Client, user_id: str) -> list[Acti
                     description=r.get("description"),
                     category=r.get("category"),
                     status=r.get("status"),
+                    organization=r.get("organization", None),
                 )
             )
         return activities
     except Exception as e:
-        logger.error(f"Error getting all documents for user: {user_id}, error: {e}")
+        logger.error(f"Error getting all activities for user: {user_id}, error: {e}")
         raise e
 
 
@@ -109,6 +148,7 @@ async def get_activity_details_by_id(supabase: Client, activity_id: str) -> Acti
             description=r.get("description"),
             category=r.get("category"),
             status=r.get("status"),
+            organization=r.get("organization", None),
         )
         return activity_with_id
     except Exception as e:

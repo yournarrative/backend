@@ -137,7 +137,7 @@ async def create_activities_from_check_in(
     logger.debug(f"New request to {create_activities_from_check_in_endpoint} endpoint")
     try:
         activities: list[Activity] = create_activities_from_check_in_ai(dialogue=data.dialogue)
-        return CreateActivitiesFromCheckInResponse(activites=activities)
+        return CreateActivitiesFromCheckInResponse(activities=activities)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)

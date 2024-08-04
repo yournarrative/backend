@@ -41,8 +41,7 @@ def clear_supabase_data(supabase_client):
     # Check if this is prod
     PROD_URL_STRING = "vvlnagr"
     if PROD_URL_STRING in os.environ.get("SUPABASE_URL"):
-        print("DOUBLE CHECK THAT YOU'RE NOT ABOUT TO DELETE THE PROD DB")
-        raise ValueError("Do not delete prod db please")
+        raise ValueError("DOUBLE CHECK THAT YOU'RE NOT ABOUT TO DELETE THE PROD DB PLEASE")
     # List all tables and clear the data - hardcoded because query to information schema isn't working idk
     # Do not delete "activity_category_options", "activity_status_options", or "profiles" table
     table_names = ["activities", "brag_docs", "check_ins"]

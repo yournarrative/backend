@@ -6,9 +6,16 @@ from information_retrieval.core.logger import app_logger as logger
 
 instructions = """
 Infer activities from how the questions are answered.
-If there are activities with vague titles or descriptions,
+If there are questions with vague answers,
 such as 'learned something' or 'did something' without specifics skills or experiences
-included, do not include it as part of the final activity list.
+included mentioned, do not include it as part of the final activity list.
+
+Also, ignore unintelligible, incomplete, or spam-like dialogue, such as repeated words or gibberish.
+
+It is okay to return an empty list if no activities can be inferred from the dialogue.
+
+It is better to be conservative with they activities that you infer from the dialogue,
+than trying to infer too many activities.
 """
 
 

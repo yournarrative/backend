@@ -9,6 +9,9 @@ from information_retrieval.core.logger import app_logger as logger
 instructions = """
 Take the details of an Activity in the form of a JSON object and update the fields
 as necessary to reflect the new details.
+
+If there is no Organization initially, do not force adding one. If there is, do not change it without
+strong evidence.
 """
 
 
@@ -23,6 +26,7 @@ def update_activity_with_new_details_ai(activity_with_id: ActivityWithID, update
         "description": activity_with_id.description,
         "category": activity_with_id.category,
         "status": activity_with_id.status,
+        "organization": activity_with_id.organization,
     }
     request_string = json.dumps(activity_dict) + "\n Update:\n" + update
     try:
@@ -33,6 +37,9 @@ def update_activity_with_new_details_ai(activity_with_id: ActivityWithID, update
             description=updated_activity.description,
             category=updated_activity.category,
             status=updated_activity.status,
+            organization=(
+                updated_activity.organization if updated_activity.organization else activity_with_id.organization
+            ),
         )
     except Exception as e:
         logger.error(f"Failed to update activity with id {activity_with_id.id} - {e}")

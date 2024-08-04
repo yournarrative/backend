@@ -17,6 +17,7 @@ class Activity(BaseModel):
         description="The status of this activity. "
         "Choices are ['Not Started', 'In Progress', 'Completed', 'Archived']",
     )
+    organization: Optional[str] = Field(None, description="The Organization associated with this Activity, if any.")
 
 
 class ActivityWithID(Activity):
