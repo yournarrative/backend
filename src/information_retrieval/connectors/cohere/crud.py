@@ -1,51 +1,32 @@
-# from typing import List, Dict
-#
+# import cohere
 # from cohere.responses import Chat
-# from starlette.datastructures import State
 #
-# from information_retrieval.api.api_v1.model.query import RAGResponse
-# from information_retrieval.utils.logger import app_logger as logger
+# from information_retrieval.core.logger import app_logger as logger
+#
+# DOC_LIMIT = 20
 #
 #
-# async def RAG_query(user_email: str, query: str, state: State) -> RAGResponse:
-#     logger.debug(f"Searching {user_email}'s documents with query {query}...")
+# async def rag_query(cohere_client: cohere.Client, query: str, documents: list[dict]) -> str:
+#     logger.debug("Starting RAG query with Cohere Client...")
 #
-# # i = 0
-# formatted_docs: List[Dict] = []
-# for d in documents:
-#     f = {
-#         # "title": f"Fake title {i}",
-#         "snippet": d.content
-#     }
-#     formatted_docs.append(f)
-#     # i += 1
+#     formatted_docs: list[dict] = []
+#     for d in documents[:DOC_LIMIT]:
+#         f = {
+#             "title": d.get("title", ""),
+#             "description": d.get("description", ""),
+#             "status": d.get("status", ""),
+#         }
+#         formatted_docs.append(f)
 #
-# try:
-#     logger.debug(f"Sending query to Cohere API...")
-#     response: Chat = state.cohere_client.chat(
-#         model="command",
-#         message=query,
-#         documents=formatted_docs,
-#         prompt_truncation='AUTO'
-#     )
-#     logger.debug(f"Successfully fetched response from Cohere API.")
+#     logger.debug("Sending query to Cohere API...")
+#     try:
+#         response: Chat = cohere_client.chat(
+#             model="command", message=query, documents=formatted_docs, prompt_truncation="AUTO"
+#         )
+#     except Exception as e:
+#         logger.error(f"Error fetching response from Cohere API, error: {e}")
+#         raise e
 #
-# except Exception as e:
-#     logger.error(f"Error fetching response from Cohere API, error: {e}")
-#     raise e
-#
-# # Wrapping in try/catch in case cohere response format changes
-# # Could do more elegantly with key checks
-# try:
-#     rag_response = RAGResponse(
-#         user_email=user_email,
-#         query=query,
-#         response=response.text,
-#         citations=response.citations,
-#         documents=response.documents,
-#     )
-# except Exception as e:
-#     logger.error(f"Error parsing response from Cohere API: {response}, error: {e}")
-#     raise e
-#
-# return rag_response
+#     else:
+#         logger.debug("Successfully fetched response from Cohere API.")
+#         return response.text

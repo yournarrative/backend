@@ -6,6 +6,8 @@ from information_retrieval.api.v1.models.activity import (
     CreateActivitiesFromCheckInRequest,
     CreateActivitiesFromCheckInResponse,
     DeleteActivitiesRequest,
+    GetActivitiesAISummaryRequest,
+    GetActivitiesAISummaryResponse,
     GetActivitiesRequest,
     GetActivitiesResponse,
     InsertActivitiesForUserRequest,
@@ -13,6 +15,7 @@ from information_retrieval.api.v1.models.activity import (
     UpdateActivityWithNewDetailsResponse,
     UpsertActivityRequest,
 )
+from information_retrieval.api.v1.processing.ai.activity_list_to_summary import create_summary_from_activities_ai
 from information_retrieval.api.v1.processing.ai.check_in_to_activities import create_activities_from_check_in_ai
 from information_retrieval.api.v1.processing.ai.update_existing_activity import update_activity_with_new_details_ai
 from information_retrieval.connectors.supabase.crud import (
@@ -138,6 +141,20 @@ async def create_activities_from_check_in(
     try:
         activities: list[Activity] = create_activities_from_check_in_ai(dialogue=data.dialogue)
         return CreateActivitiesFromCheckInResponse(activities=activities)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500)
+
+
+get_ai_summary_for_activities_endpoint = "/v1/activities/getAISummaryForActivities/"
+
+
+@router.post(get_ai_summary_for_activities_endpoint)
+async def get_ai_summary_for_activities(data: GetActivitiesAISummaryRequest):
+    logger.debug(f"New request to {get_ai_summary_for_activities_endpoint} endpoint")
+    try:
+        summary: str = create_summary_from_activities_ai(activities=data.activities)
+        return GetActivitiesAISummaryResponse(summary=summary)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)

@@ -5,6 +5,7 @@ from information_retrieval.api.v1.routers.activity import (
     create_activities_from_check_in_endpoint,
     delete_activities_endpoint,
     get_activities_endpoint,
+    get_ai_summary_for_activities_endpoint,
     insert_activities_endpoint,
     update_activity_with_new_details_endpoint,
     upsert_activity_endpoint,
@@ -256,3 +257,103 @@ class TestActivitiesEndpoints:
         response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
         assert response.status_code == 200
         assert response.json().get("activities") == []
+
+    def test_get_ai_summary_for_activities(self):
+        activities_data = {
+            "activities": [
+                {
+                    "title": "activity1",
+                    "description": "Completed unit testing in Python using Pytest",
+                    "category": "Achievement",
+                    "status": "Completed",
+                },
+                {
+                    "title": "activity2",
+                    "description": "Started integration testing for FastAPI application",
+                    "category": "Achievement",
+                    "status": "In Progress",
+                },
+            ],
+        }
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert response.status_code == 200
+
+        response_data = response.json()
+        print(response_data["summary"])
+        assert "summary" in response_data
+        assert isinstance(response_data["summary"], str)
+        assert len(response_data["summary"]) > 0  # Check that summary is not empty
+
+    def test_get_ai_summary_for_empty_activities(self):
+        activities_data = {"activities": []}
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert "summary" in response_data
+        assert response_data["summary"] == ""  # Expect an empty summary for empty activities
+
+    def test_get_ai_summary_for_invalid_data(self):
+        # Invalid data: Missing "activities" key
+        invalid_data = {"wrong_key": []}
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=invalid_data)
+        assert response.status_code == 422  # Expecting validation error
+
+    def test_get_ai_summary_with_invalid_activity_format(self):
+        # Invalid activity format: Missing required fields
+        activities_data = {
+            "activities": [
+                {
+                    "title": "activity1",
+                    # Missing "description", "category", "status"
+                }
+            ]
+        }
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert response.status_code == 422  # Expecting validation error
+
+    def test_get_ai_summary_for_mixed_valid_and_invalid_activities(self):
+        # Some activities are valid, others are missing required fields
+        activities_data = {
+            "activities": [
+                {
+                    "title": "activity1",
+                    "description": "Completed unit testing",
+                    "category": "Achievement",
+                    "status": "Completed",
+                },
+                {
+                    "title": "activity2",
+                    # Missing "description", "category", "status"
+                },
+            ]
+        }
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert response.status_code == 422  # Expecting validation error
+
+    def test_get_ai_summary_for_long_activities_list(self):
+        # Generate a large number of activities
+        activities_data = {
+            "activities": [
+                {
+                    "title": f"activity{i}",
+                    "description": f"description for activity {i}",
+                    "category": "Achievement",
+                    "status": "In Progress",
+                }
+                for i in range(100)
+            ]
+        }
+
+        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert "summary" in response_data
+        assert isinstance(response_data["summary"], str)
+        assert len(response_data["summary"]) > 0

@@ -1,12 +1,12 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from pydantic.v1 import validator
 
 
 class Activity(BaseModel):
     title: str = Field(..., description="The inferred title of this activity, summarizing what it's about.")
     description: str = Field(..., description="The description of this activity. What has the person said about it?")
-    # TODO: Check if the AI returned value is actualy in one of these options for each field
     category: str = Field(
         ...,
         description="The category of this activity. "
@@ -18,6 +18,34 @@ class Activity(BaseModel):
         "Choices are ['Not Started', 'In Progress', 'Completed', 'Archived']",
     )
     organization: Optional[str] = Field(None, description="The Organization associated with this Activity, if any.")
+
+    @validator("title", pre=True, always=True)
+    def normalize_title(cls, value):
+        if isinstance(value, str):
+            return value.strip()[:100]
+        return value
+
+    @validator("description", pre=True, always=True)
+    def normalize_description(cls, value):
+        if isinstance(value, str):
+            return value.strip()[:1000]
+        return value
+
+    @validator("category", pre=True, always=True)
+    def verify_category(cls, value):
+        choices = ["Skill", "Achievement", "Endorsement", "Miscellaneous"]
+        if value in choices:
+            return value
+        else:
+            return "Miscellaneous"
+
+    @validator("status", pre=True, always=True)
+    def verify_status(cls, value):
+        choices = ["Not Started", "In Progress", "Completed", "Archived"]
+        if value in choices:
+            return value
+        else:
+            return "Completed"
 
 
 class ActivityWithID(Activity):
@@ -63,3 +91,11 @@ class GetActivitiesResponse(BaseModel):
 
 class DeleteActivitiesRequest(BaseModel):
     activity_id_list: list[str]
+
+
+class GetActivitiesAISummaryRequest(BaseModel):
+    activities: list[Activity]
+
+
+class GetActivitiesAISummaryResponse(BaseModel):
+    summary: str

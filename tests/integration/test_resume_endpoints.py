@@ -25,7 +25,7 @@ class TestUploadResumeEndpoint:
         assert isinstance(response.json()["activities"], list)
 
     def test_upload_valid_real_pdf(self):
-        file_path = os.path.join("tests", "resources", "resumes", "ShayaanResume.pdf")
+        file_path = os.path.join("tests", "resources", "resumes", "SiddResume.pdf")
         with open(file_path, "rb") as f:
             file_content = f.read()
 
@@ -36,8 +36,6 @@ class TestUploadResumeEndpoint:
         assert response.status_code == 200
         assert "activities" in response.json()
         assert isinstance(response.json()["activities"], list)
-        # print(response.json().get("activities"))
-        # assert 1 == 2
 
     def test_upload_invalid_file_type(self):
         file_content = b"Invalid content"

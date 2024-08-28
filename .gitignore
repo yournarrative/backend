@@ -188,6 +188,7 @@ Cargo.lock
 ##########################################################################################
 tmp
 resources/audio
+tests/resources/resumes
 audio/static/
 **.DS_Store
 **/*.env
