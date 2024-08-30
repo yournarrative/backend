@@ -93,9 +93,15 @@ class DeleteActivitiesRequest(BaseModel):
     activity_id_list: list[str]
 
 
-class GetActivitiesAISummaryRequest(BaseModel):
-    activities: list[Activity]
-
-
-class GetActivitiesAISummaryResponse(BaseModel):
+class UserOrganizationData(BaseModel):
     summary: str
+    activities: list[ActivityWithID]
+
+
+class GetActivitiesForDisplayRequest(BaseModel):
+    user_id: str
+    include_summaries: bool = False
+
+
+class GetActivitiesForDisplayResponse(BaseModel):
+    user_organization_data_map: dict[str, UserOrganizationData]

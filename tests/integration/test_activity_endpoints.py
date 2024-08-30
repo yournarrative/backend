@@ -5,7 +5,7 @@ from information_retrieval.api.v1.routers.activity import (
     create_activities_from_check_in_endpoint,
     delete_activities_endpoint,
     get_activities_endpoint,
-    get_ai_summary_for_activities_endpoint,
+    get_activities_for_display_endpoint,
     insert_activities_endpoint,
     update_activity_with_new_details_endpoint,
     upsert_activity_endpoint,
@@ -214,8 +214,6 @@ class TestActivitiesEndpoints:
         }
 
         response = self.user_client.post(create_activities_from_check_in_endpoint, json=dialogue_data)
-        print(response)
-        print(response.json())
         assert response.status_code == 200
 
         response_data = response.json()
@@ -258,102 +256,104 @@ class TestActivitiesEndpoints:
         assert response.status_code == 200
         assert response.json().get("activities") == []
 
-    def test_get_ai_summary_for_activities(self):
-        activities_data = {
+    def test_get_activities_for_display(self):
+        # First, insert some activities associated with different organizations
+        insert_data = {
+            "user_id": TEST_USER_UUID,
             "activities": [
                 {
-                    "title": "activity1",
-                    "description": "Completed unit testing in Python using Pytest",
-                    "category": "Achievement",
+                    "title": "Learned Python Basics",
+                    "description": "Took a 6 month intensive course to learn python basics, including data structures and algorithms",
+                    "category": "Skill",
                     "status": "Completed",
+                    "organization": "Personal",
                 },
                 {
-                    "title": "activity2",
-                    "description": "Started integration testing for FastAPI application",
+                    "title": "Building Personal Website",
+                    "description": "Building a personal website in Javascript and python using Django",
                     "category": "Achievement",
                     "status": "In Progress",
+                    "organization": "Personal",
+                },
+                {
+                    "title": "Learned how to manage a team",
+                    "description": "Read 3 books on team management and took over a small project, overseeing a team of 5 developers",
+                    "category": "Skill",
+                    "status": "Completed",
+                    "organization": "Acme Corp",
+                },
+                {
+                    "title": "Learned how deploy a production service",
+                    "description": "Released a 6 month project to production, including setting up CI/CD pipelines and monitoring",
+                    "category": "Skill",
+                    "status": "Completed",
+                    "organization": "Acme Corp",
                 },
             ],
         }
 
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        self.user_client.post(insert_activities_endpoint, json=insert_data)
+
+        # Request activities for display without summaries
+        request_data = {"user_id": TEST_USER_UUID, "include_summaries": True}
+        response = self.user_client.post(get_activities_for_display_endpoint, json=request_data)
         assert response.status_code == 200
 
         response_data = response.json()
-        print(response_data["summary"])
-        assert "summary" in response_data
-        assert isinstance(response_data["summary"], str)
-        assert len(response_data["summary"]) > 0  # Check that summary is not empty
 
-    def test_get_ai_summary_for_empty_activities(self):
-        activities_data = {"activities": []}
+        assert "user_organization_data_map" in response_data
+        assert len(response_data["user_organization_data_map"]) == 2  # Two organizations
+        assert "Acme Corp" in response_data["user_organization_data_map"]
+        assert "Personal" in response_data["user_organization_data_map"]
 
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        assert "user_organization_data_map" in response_data
+        assert len(response_data["user_organization_data_map"]) == 2  # Two organizations
+
+        # Verify that summaries are included
+        personal = response_data["user_organization_data_map"]["Personal"]
+        assert len(personal["activities"]) == 2
+        assert len(personal["summary"]) > 0  # Summary should not be empty
+
+        acme_data = response_data["user_organization_data_map"]["Acme Corp"]
+        assert len(acme_data["activities"]) == 2
+        assert len(acme_data["summary"]) > 0  # Summary should not be empty
+
+    def test_get_activities_for_display_empty_user(self):
+        # Request activities for a user with no activities
+        request_data = {"user_id": "nonexistent-user-id", "include_summaries": False}
+        response = self.user_client.post(get_activities_for_display_endpoint, json=request_data)
         assert response.status_code == 200
 
         response_data = response.json()
-        assert "summary" in response_data
-        assert response_data["summary"] == ""  # Expect an empty summary for empty activities
+        assert "user_organization_data_map" in response_data
+        assert len(response_data["user_organization_data_map"]) == 0  # No organizations
 
-    def test_get_ai_summary_for_invalid_data(self):
-        # Invalid data: Missing "activities" key
-        invalid_data = {"wrong_key": []}
-
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=invalid_data)
-        assert response.status_code == 422  # Expecting validation error
-
-    def test_get_ai_summary_with_invalid_activity_format(self):
-        # Invalid activity format: Missing required fields
-        activities_data = {
+    def test_get_activities_for_display_with_no_organizations(self):
+        # Insert activities without any organization
+        insert_data = {
+            "user_id": TEST_USER_UUID,
             "activities": [
                 {
                     "title": "activity1",
-                    # Missing "description", "category", "status"
-                }
-            ]
-        }
-
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
-        assert response.status_code == 422  # Expecting validation error
-
-    def test_get_ai_summary_for_mixed_valid_and_invalid_activities(self):
-        # Some activities are valid, others are missing required fields
-        activities_data = {
-            "activities": [
-                {
-                    "title": "activity1",
-                    "description": "Completed unit testing",
-                    "category": "Achievement",
-                    "status": "Completed",
-                },
-                {
-                    "title": "activity2",
-                    # Missing "description", "category", "status"
-                },
-            ]
-        }
-
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
-        assert response.status_code == 422  # Expecting validation error
-
-    def test_get_ai_summary_for_long_activities_list(self):
-        # Generate a large number of activities
-        activities_data = {
-            "activities": [
-                {
-                    "title": f"activity{i}",
-                    "description": f"description for activity {i}",
+                    "description": "some description",
                     "category": "Achievement",
                     "status": "In Progress",
                 }
-                for i in range(100)
-            ]
+            ],
         }
+        self.user_client.post(insert_activities_endpoint, json=insert_data)
 
-        response = self.user_client.post(get_ai_summary_for_activities_endpoint, json=activities_data)
+        # Request activities for display
+        request_data = {"user_id": TEST_USER_UUID, "include_summaries": False}
+        response = self.user_client.post(get_activities_for_display_endpoint, json=request_data)
         assert response.status_code == 200
 
         response_data = response.json()
-        assert "summary" in response_data
-        assert isinstance(response_data["summary"], str)
-        assert len(response_data["summary"]) > 0
+        assert "user_organization_data_map" in response_data
+        assert len(response_data["user_organization_data_map"]) == 1  # We should default to "Personal" as organization
+
+    def test_get_activities_for_display_invalid_user_id(self):
+        # Request activities with an invalid user ID
+        request_data = {"user_id": 12345, "include_summaries": False}  # User ID should be a string
+        response = self.user_client.post(get_activities_for_display_endpoint, json=request_data)
+        assert response.status_code == 422  # Expecting validation error

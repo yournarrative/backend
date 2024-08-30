@@ -6,20 +6,22 @@ from information_retrieval.api.v1.models.activity import (
     CreateActivitiesFromCheckInRequest,
     CreateActivitiesFromCheckInResponse,
     DeleteActivitiesRequest,
-    GetActivitiesAISummaryRequest,
-    GetActivitiesAISummaryResponse,
+    GetActivitiesForDisplayRequest,
+    GetActivitiesForDisplayResponse,
     GetActivitiesRequest,
     GetActivitiesResponse,
     InsertActivitiesForUserRequest,
     UpdateActivityWithNewDetailsRequest,
     UpdateActivityWithNewDetailsResponse,
     UpsertActivityRequest,
+    UserOrganizationData,
 )
 from information_retrieval.api.v1.processing.ai.activity_list_to_summary import create_summary_from_activities_ai
 from information_retrieval.api.v1.processing.ai.check_in_to_activities import create_activities_from_check_in_ai
 from information_retrieval.api.v1.processing.ai.update_existing_activity import update_activity_with_new_details_ai
 from information_retrieval.connectors.supabase.crud import (
     get_activities_by_user_id,
+    get_activities_grouped_by_organization,
     get_activity_details_by_id,
     insert_new_user_activities,
     soft_delete_activities_by_id,
@@ -146,15 +148,31 @@ async def create_activities_from_check_in(
         raise HTTPException(status_code=500)
 
 
-get_ai_summary_for_activities_endpoint = "/v1/activities/getAISummaryForActivities/"
+get_activities_for_display_endpoint = "/v1/activities/getActivitiesForDisplay/"
 
 
-@router.post(get_ai_summary_for_activities_endpoint)
-async def get_ai_summary_for_activities(data: GetActivitiesAISummaryRequest):
-    logger.debug(f"New request to {get_ai_summary_for_activities_endpoint} endpoint")
+@router.post(get_activities_for_display_endpoint)
+async def get_ai_summary_for_activities(
+    data: GetActivitiesForDisplayRequest, request: Request
+) -> GetActivitiesForDisplayResponse:
+    logger.debug(f"New request to {get_activities_for_display_endpoint} endpoint")
     try:
-        summary: str = create_summary_from_activities_ai(activities=data.activities)
-        return GetActivitiesAISummaryResponse(summary=summary)
+        activities_grouped_by_organization: dict[
+            str, list[ActivityWithID]
+        ] = await get_activities_grouped_by_organization(
+            supabase=request.app.state.supabase_client, user_id=data.user_id
+        )
+
+        activity_response_map: dict[str, UserOrganizationData] = {}
+
+        for organization, activities in activities_grouped_by_organization.items():
+            if data.include_summaries:
+                summary: str = create_summary_from_activities_ai(activities=activities)
+            else:
+                summary = ""
+            activity_response_map[organization] = UserOrganizationData(activities=activities, summary=summary)
+
+        return GetActivitiesForDisplayResponse(user_organization_data_map=activity_response_map)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500)

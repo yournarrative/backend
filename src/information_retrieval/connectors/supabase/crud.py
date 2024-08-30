@@ -105,7 +105,7 @@ async def insert_new_user_activities(supabase: Client, user_id: str, activities:
             d["user_id"] = user_id
             data_to_upsert.append(d)
 
-        data, count = supabase.table("activities").upsert(data_to_upsert).execute()
+        _, _ = supabase.table("activities").upsert(data_to_upsert).execute()
     except Exception as e:
         logger.error(f"Error uploading activities for user: {user_id}, error: {e}")
         raise e
@@ -153,4 +153,41 @@ async def get_activity_details_by_id(supabase: Client, activity_id: str) -> Acti
         return activity_with_id
     except Exception as e:
         logger.error(f"Error getting activity details for activity_id: {activity_id}, error: {e}")
+        raise e
+
+
+async def get_activities_grouped_by_organization(supabase: Client, user_id: str) -> dict[str, list[ActivityWithID]]:
+    logger.debug(f"Getting activities grouped by organization for user: {user_id}")
+    try:
+        response: APIResponse = (
+            supabase.table("activities")
+            .select("id, title, description, category, status, organization")
+            # .eq("user_id", user_id)
+            .eq("deleted", False)
+            .execute()
+        )
+
+        activities_grouped_by_organization = {}
+        for r in response.data:
+            organization = r.get("organization", None)
+
+            if organization is None or organization == "":
+                organization = "Personal"
+
+            if organization not in activities_grouped_by_organization:
+                activities_grouped_by_organization[organization] = []
+
+            activities_grouped_by_organization[organization].append(
+                ActivityWithID(
+                    id=r.get("id"),
+                    title=r.get("title"),
+                    description=r.get("description"),
+                    category=r.get("category"),
+                    status=r.get("status"),
+                    organization=r.get("organization", None),
+                )
+            )
+        return activities_grouped_by_organization
+    except Exception as e:
+        logger.error(f"Error getting activities grouped by organization for user: {user_id}, error: {e}")
         raise e
