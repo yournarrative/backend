@@ -1,3 +1,4 @@
+from httpx import Response
 from postgrest import APIResponse
 from supabase import Client
 
@@ -191,3 +192,29 @@ async def get_activities_grouped_by_organization(supabase: Client, user_id: str)
     except Exception as e:
         logger.error(f"Error getting activities grouped by organization for user: {user_id}, error: {e}")
         raise e
+
+
+async def upsert_file_to_object_storage(
+    supabase: Client, user_id: str, bucket_name: str, file_name: str, file_content: bytes, file_content_type: str
+):
+    file_name = f"{user_id}/{file_name}"
+    try:
+        response: Response = supabase.storage.from_(bucket_name).upload(
+            path=file_name, file=file_content, file_options={"upsert": "true", "content-type": file_content_type}
+        )
+        if response.status_code != 200:
+            raise Exception(f"File upsert response - {response.status_code}; {response.text}")
+    except Exception as e:
+        logger.error(f"Failed to upsert file {file_name} to bucket {bucket_name}: {e}")
+        raise e
+
+
+async def get_file_from_object_storage(supabase: Client, user_id: str, bucket_name: str, file_name: str) -> bytes:
+    file_name = f"{user_id}/{file_name}"
+    try:
+        content: bytes = supabase.storage.from_(bucket_name).download(file_name)
+    except Exception as e:
+        logger.error(f"Failed to download file {file_name} from bucket {bucket_name}: {e}")
+        raise e
+    else:
+        return content

@@ -17,14 +17,16 @@ class Settings:
     def load_env() -> dict[str, str]:
         logger.debug("Loading env variables...")
         env = dict(os.environ)
+        print(env)
         logger.debug("Env variables loaded.")
         return env
 
     @staticmethod
     def load_config_from_env(env: str) -> dict[str, Any]:
         logger.debug(f"Loading config from env: {env}")
-        env = env.replace('"', "")
-        with open(f"resources/config/{env}/conf.yaml", "r") as config_file:
+        e = env.replace('"', "")
+        print(e)
+        with open(f"resources/config/{e}/conf.yaml", "r") as config_file:
             config = yaml.safe_load(config_file)
         logger.debug(f"Config loaded: {config}")
         return config

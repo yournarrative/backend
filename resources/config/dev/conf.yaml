@@ -2,6 +2,7 @@ MAX_FILE_SIZE: 5242880 # 5 MB
 ALLOWED_ORIGINS:
   - https://www.narrative.io
   - https://narrative.io
+  - localhost
 PROFILE_PICTURE_BUCKET: profile-pictures
 DOCUMENTS_BUCKET: user-documents
 RESUME_ACCEPTED_FILETYPES:

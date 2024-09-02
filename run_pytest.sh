@@ -1,3 +1,3 @@
 #!/bin/bash
-export ENVIRONMENT=local
+export ENVIRONMENT=dev
 poetry run pytest

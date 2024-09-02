@@ -192,3 +192,6 @@ tests/resources/resumes
 audio/static/
 **.DS_Store
 **/*.env
+legacy/
+tests/test_output/
+tests/resources

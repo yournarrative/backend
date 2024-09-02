@@ -26,7 +26,7 @@ AWS Setup for subdomain (backend.prod.narrative.ai)
 
 ### TODO:
 
-1. Read the FastAPI docs gg
+1. Read the FastAPI docs
    1. Check CORS accuracy
    2. Figure out right pattern for tests and write them
    3. Update security to check if updated activities belong to a user

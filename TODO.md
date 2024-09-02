@@ -1,0 +1,1 @@
+- Add "application/vnd.openxmlformats-officedocument.wordprocessingml.document" to allowed resume types later

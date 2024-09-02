@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 # DO NOT CHANGE THIS TO PROD OR YOU WILL DELETE EVERYTHING :)
 # Need to be loaded before FastAPI app is imported to load env properly
-load_dotenv("resources/config/local/local.env")
+load_dotenv("resources/config/dev/dev.env")
 
 from information_retrieval.connectors.supabase.client import create_supabase_client
 from information_retrieval.main import app
@@ -42,13 +42,19 @@ def clear_supabase_data(supabase_client):
     PROD_URL_STRING = "vvlnagr"
     if PROD_URL_STRING in os.environ.get("SUPABASE_URL"):
         raise ValueError("DOUBLE CHECK THAT YOU'RE NOT ABOUT TO DELETE THE PROD DB PLEASE")
-    # List all tables and clear the data - hardcoded because query to information schema isn't working idk
-    # Do not delete "activity_category_options", "activity_status_options", or "profiles" table
-    table_names = ["activities", "brag_docs", "check_ins"]
 
     # Extract table names from the result
+    # List all tables related to user data that need to be cleared
+    # IMPORTANT: Do not delete "activity_category_options", "activity_status_options", or "profiles" table
+    table_names = ["activities", "brag_docs", "check_ins", "user_events"]
+
+    # Extract table names from the result and clear data for specific user
     for table_name in table_names:
-        supabase_client.table(table_name).delete().neq(
-            "id", uuid.UUID("00000000-0000-0000-0000-000000000000")
-        ).execute()
+        supabase_client.table(table_name).delete().eq("user_id", uuid.UUID(TEST_USER_UUID)).execute()
+
+    # bucket_names = ["profile-pictures", "user-documents"]
+    # for bucket_name in bucket_names:
+    #     files = supabase_client.storage.from_(bucket_name).list(TEST_USER_UUID)
+    #     for file in files:
+    #         supabase_client.storage.from_(bucket_name).remove(TEST_USER_UUID + "/" + file["name"])
     yield

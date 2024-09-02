@@ -62,11 +62,12 @@ gunicorn = "^21.2.0"
 requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 cohere = "^4.50"
-supabase = "^2.4.3"
 marvin = "^2.3.4"
 ping3 = "^4.0.8"
 pymupdf = "^1.24.9"
 python-multipart = "^0.0.9"
+pillow = "^10.4.0"
+supabase = "^2.7.3"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=3.5.0"
