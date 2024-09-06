@@ -18,6 +18,7 @@ async def get_user_profile_data_by_id(supabase: Client, user_id: str) -> Narrati
             bio=response.data[0].get("bio", None),
             linkedin_profile_url=response.data[0].get("linkedin_profile_url", None),
             current_organization=response.data[0].get("current_organization", None),
+            loom_url=response.data[0].get("loom_url", None),
         )
         return user
     except Exception as e:

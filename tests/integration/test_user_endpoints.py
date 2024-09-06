@@ -36,13 +36,18 @@ class TestUsersEndpoints:
         # Create random data for update
         random_bio = random_string()
         random_linkedin_url = f"https://linkedin.com/in/{random_string()}"
+        random_loom_url = f"https://loom.com/{random_string()}"
         user_data = get_response.json()["user_data"]
         user_data["bio"] = random_bio
         user_data["linkedin_profile_url"] = random_linkedin_url
+        user_data["loom_url"] = random_loom_url
+
+        print(user_data)
 
         # Update user data
         update_request_data = {"user_data": user_data}
         update_response = self.user_client.post(update_user_profile_data_endpoint, json=update_request_data)
+        print(update_response)
         assert update_response.status_code == 200
 
         # Get updated user data to verify changes
@@ -52,6 +57,7 @@ class TestUsersEndpoints:
         updated_user_data = verify_response.json()["user_data"]
         assert updated_user_data["bio"] == random_bio
         assert updated_user_data["linkedin_profile_url"] == random_linkedin_url
+        assert updated_user_data["loom_url"] == random_loom_url
 
     def test_get_all_organizations_for_a_user(self):
         o1 = "Organization 1"

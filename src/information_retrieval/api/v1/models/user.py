@@ -10,6 +10,7 @@ class NarrativeUser(BaseModel):
     phone_number: Optional[str]
     current_organization: Optional[str]
     linkedin_profile_url: Optional[str]
+    loom_url: Optional[str]
 
 
 class GetUserProfileDataRequest(BaseModel):
