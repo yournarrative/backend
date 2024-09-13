@@ -19,6 +19,7 @@ async def get_user_profile_data_by_id(supabase: Client, user_id: str) -> Narrati
             linkedin_profile_url=response.data[0].get("linkedin_profile_url", None),
             current_organization=response.data[0].get("current_organization", None),
             loom_url=response.data[0].get("loom_url", None),
+            resume_file_name=response.data[0].get("resume_file_name", None),
         )
         return user
     except Exception as e:
@@ -29,7 +30,7 @@ async def get_user_profile_data_by_id(supabase: Client, user_id: str) -> Narrati
 async def update_user_profile_data_by_id(supabase: Client, user: NarrativeUser):
     logger.debug(f"Updating user profile for user_id: {user.user_id}")
 
-    user_data_dict = user.dict()
+    user_data_dict = user.dict(exclude_none=True)
     del user_data_dict["user_id"]
 
     try:

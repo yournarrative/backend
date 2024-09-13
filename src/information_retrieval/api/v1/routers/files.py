@@ -14,10 +14,16 @@ from information_retrieval.api.v1.models.files import (
     UploadProfilePictureRequest,
     UploadResumeRequest,
 )
+from information_retrieval.api.v1.models.user import NarrativeUser
 from information_retrieval.api.v1.processing.ai.resume_to_activities import create_activities_from_resume_ai
 from information_retrieval.api.v1.processing.extraction.pdf import extract_text_from_pdf
 from information_retrieval.api.v1.processing.extraction.utils import is_accepted_file_type, normalize_image
-from information_retrieval.connectors.supabase.crud import get_file_from_object_storage, upsert_file_to_object_storage
+from information_retrieval.connectors.supabase.crud import (
+    get_file_from_object_storage,
+    get_user_profile_data_by_id,
+    update_user_profile_data_by_id,
+    upsert_file_to_object_storage,
+)
 from information_retrieval.core.logger import app_logger as logger
 
 router = APIRouter()
@@ -28,8 +34,9 @@ upload_resume_endpoint = "/v1/files/uploadResume/"
 
 def parse_upload_resume_request_data(
     user_id: Annotated[str, Form(...)],
+    file_name: Annotated[str, Form(...)],
 ) -> UploadResumeRequest:
-    return UploadResumeRequest(user_id=user_id)
+    return UploadResumeRequest(user_id=user_id, file_name=file_name)
 
 
 @router.post(upload_resume_endpoint)
@@ -57,10 +64,21 @@ async def upload_resume(
             file_content_type=file.content_type,
         )
     except Exception as e:
-        logger.error(f"Error uploading resume to file storage: {e}")
+        logger.error(f"Error uploading resume to file storage for user {data.user_id}: {e}")
         raise HTTPException(status_code=500, detail="Error uploading PDF file")
     else:
-        logger.debug(f"Resume uploaded for user {data.user_id} successfully")
+        logger.debug(f"Resume uploaded to file storage for user {data.user_id} successfully")
+
+    try:
+        await update_user_profile_data_by_id(
+            supabase=request.app.state.supabase_client,
+            user=NarrativeUser(user_id=data.user_id, resume_file_name=data.file_name),
+        )
+    except Exception as e:
+        logger.error(f"Error updating user profile {data.user_id} with resume name {data.file_name}: {e}")
+        raise HTTPException(status_code=500, detail="Error updating User Profile")
+    else:
+        logger.debug(f"Resume name in user {data.user_id} profile updated successfully")
         return Response(status_code=200)
 
 
@@ -85,10 +103,17 @@ async def get_resume(
     except Exception as e:
         logger.error(f"Error fetching resume for user {data.user_id} from file storage: {e}")
         raise HTTPException(status_code=500, detail="Error fetching requested resume from file storage")
+
+    try:
+        user_data: NarrativeUser = await get_user_profile_data_by_id(request.app.state.supabase_client, data.user_id)
+        filename: str = user_data.resume_file_name
+    except Exception as e:
+        logger.error(f"Error fetching resume file name for user {data.user_id} from user profile: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching requested resume from user profile")
     return StreamingResponse(
         file_stream,
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=resume.pdf"},
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
 
 

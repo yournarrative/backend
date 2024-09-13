@@ -26,21 +26,21 @@ class TestUploadResumeEndpoint:
             file_content = f.read()
 
         files = {"file": ("ShayaanResume.pdf", BytesIO(file_content), "application/pdf")}
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "ShayaanResume.pdf"}  # Include file_name in data
 
         response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert response.status_code == 200
 
     def test_upload_empty_file(self):
         files = {"file": ("empty_resume.pdf", BytesIO(b""), "application/pdf")}
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "empty_resume.pdf"}  # Include file_name in data
 
         response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert response.status_code == 400
-        assert response.json() == {"detail": "Empty file"}  # Updated to check JSON response
+        assert response.json() == {"detail": "Empty file"}
 
     def test_upload_missing_file(self):
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "missing_resume.pdf"}  # Include file_name in data
 
         response = self.user_client.post(upload_resume_endpoint, files={}, data=data)
         assert response.status_code == 422  # Unprocessable Entity due to missing file
@@ -49,7 +49,7 @@ class TestUploadResumeEndpoint:
     def test_upload_invalid_file_type(self):
         file_content = b"Invalid content"
         files = {"file": ("resume.txt", BytesIO(file_content), "text/plain")}
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "resume.txt"}  # Include file_name in data
 
         response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert response.status_code == 400
@@ -58,7 +58,7 @@ class TestUploadResumeEndpoint:
     def test_upload_large_file(self):
         large_content = b"%PDF-1.4\n%..." + b"A" * (5 * 1024 * 1024 + 1)  # Just over 5 MB
         files = {"file": ("large_resume.pdf", BytesIO(large_content), "application/pdf")}
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "large_resume.pdf"}  # Include file_name in data
 
         response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert response.status_code == 413
@@ -69,7 +69,7 @@ class TestUploadResumeEndpoint:
         with open(os.path.join("tests", "resources", "resumes", "ShayaanResume.pdf"), "rb") as f:
             file_content = f.read()
         files = {"file": ("resume.pdf", BytesIO(file_content), "application/pdf")}
-        data = {"user_id": TEST_USER_UUID}
+        data = {"user_id": TEST_USER_UUID, "file_name": "ShayaanResume.pdf"}
         upload_response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert upload_response.status_code == 200
 
@@ -84,15 +84,16 @@ class TestUploadResumeEndpoint:
     def test_fetch_resume_file_not_found(self):
         # Attempt to fetch a resume that doesn't exist
         fetch_data = {"user_id": "non-existent-user-id"}
-        fetch_response = self.user_client.post(extract_activities_from_resume_endpoint, json=fetch_data)
+        fetch_response = self.user_client.post(get_resume_endpoint, json=fetch_data)
         assert fetch_response.status_code == 500
+        assert fetch_response.json() == {"detail": "Error fetching requested resume from file storage"}
 
     def test_fetch_existing_resume(self):
         # Assume the resume was uploaded first
         with open(os.path.join("tests", "resources", "resumes", "ShayaanResume.pdf"), "rb") as f:
             file_content = f.read()
-        files = {"file": ("resume.pdf", BytesIO(file_content), "application/pdf")}
-        data = {"user_id": TEST_USER_UUID}
+        files = {"file": ("ShayaanResume.pdf", BytesIO(file_content), "application/pdf")}
+        data = {"user_id": TEST_USER_UUID, "file_name": "ShayaanResume.pdf"}  # Include file_name in data
         upload_response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
         assert upload_response.status_code == 200
 
@@ -100,21 +101,27 @@ class TestUploadResumeEndpoint:
         fetch_data = {"user_id": TEST_USER_UUID}
         fetch_response = self.user_client.post(get_resume_endpoint, json=fetch_data)
         assert fetch_response.status_code == 200
-        assert fetch_response.headers["Content-Disposition"] == "attachment; filename=resume.pdf"
+        assert fetch_response.headers["Content-Disposition"] == "attachment; filename=ShayaanResume.pdf"
         assert fetch_response.headers["Content-Type"] == "application/pdf"
         assert fetch_response.content == file_content
-
-    def test_fetch_non_existent_resume(self):
-        fetch_data = {"user_id": "non-existent-user-id"}
-        fetch_response = self.user_client.post(get_resume_endpoint, json=fetch_data)
-        assert fetch_response.status_code == 500
-        assert fetch_response.json() == {"detail": "Error fetching requested resume from file storage"}
 
     def test_fetch_resume_missing_user_id(self):
         fetch_data = {}
         fetch_response = self.user_client.post(get_resume_endpoint, json=fetch_data)
         assert fetch_response.status_code == 422  # Unprocessable Entity due to missing user_id
         assert "user_id" in fetch_response.json()["detail"][0]["loc"]
+
+    def test_upload_missing_file_name(self):
+        file_path = os.path.join("tests", "resources", "resumes", "ShayaanResume.pdf")
+        with open(file_path, "rb") as f:
+            file_content = f.read()
+
+        files = {"file": ("ShayaanResume.pdf", BytesIO(file_content), "application/pdf")}
+        data = {"user_id": TEST_USER_UUID}  # No file_name provided
+
+        response = self.user_client.post(upload_resume_endpoint, files=files, data=data)
+        assert response.status_code == 422
+        assert "file_name" in response.json()["detail"][0]["loc"]
 
 
 @pytest.mark.usefixtures("setup_class_fixture")

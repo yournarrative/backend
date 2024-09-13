@@ -5,12 +5,13 @@ from pydantic import BaseModel
 
 class NarrativeUser(BaseModel):
     user_id: str
-    email: Optional[str]
-    bio: Optional[str]
-    phone_number: Optional[str]
-    current_organization: Optional[str]
-    linkedin_profile_url: Optional[str]
-    loom_url: Optional[str]
+    email: Optional[str] = None
+    bio: Optional[str] = None
+    phone_number: Optional[str] = None
+    current_organization: Optional[str] = None
+    linkedin_profile_url: Optional[str] = None
+    loom_url: Optional[str] = None
+    resume_file_name: Optional[str] = None
 
 
 class GetUserProfileDataRequest(BaseModel):

@@ -24,6 +24,7 @@ class TestUsersEndpoints:
         assert response.status_code == 200
 
         user_data = response.json()["user_data"]
+        print(user_data)
         assert user_data["user_id"] == TEST_USER_UUID
         assert user_data["email"] == TEST_USER_EMAIL
 
@@ -42,12 +43,9 @@ class TestUsersEndpoints:
         user_data["linkedin_profile_url"] = random_linkedin_url
         user_data["loom_url"] = random_loom_url
 
-        print(user_data)
-
         # Update user data
         update_request_data = {"user_data": user_data}
         update_response = self.user_client.post(update_user_profile_data_endpoint, json=update_request_data)
-        print(update_response)
         assert update_response.status_code == 200
 
         # Get updated user data to verify changes

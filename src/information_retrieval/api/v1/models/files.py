@@ -5,6 +5,7 @@ from information_retrieval.api.v1.models.activity import Activity
 
 class UploadResumeRequest(BaseModel):
     user_id: str
+    file_name: str
 
 
 class GetResumeRequest(BaseModel):
