@@ -3,6 +3,7 @@ ALLOWED_ORIGINS:
   - https://www.narrative.io
   - https://narrative.io
   - localhost
+  - http://localhost:3000
 PROFILE_PICTURE_BUCKET: profile-pictures
 DOCUMENTS_BUCKET: user-documents
 RESUME_ACCEPTED_FILETYPES:
